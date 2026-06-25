@@ -15,13 +15,12 @@ const eventSchema = new mongoose.Schema({
             type: {
                 type: String,
                 enum: ["Point"],
-                default: "Point",
             },
             coordinates: {
                 type: [Number],
-                default: undefined, // prevents empty array being saved
+                default: undefined,
             },
-        },
+        }
     },
     images: [{
         url: { type: String, required: true },
