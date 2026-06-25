@@ -14,5 +14,6 @@ export async function getMyProfile() {
         return data;
     } catch (err) {
         console.error(err)
+        throw err
     }
 }

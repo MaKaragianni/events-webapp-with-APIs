@@ -19,14 +19,34 @@ export function ProfilePage() {
             .finally(() => setLoading(false))
     }, []);
 
+    if (error) return <p>{error.message}</p>;
+
     return (
         <div>
             <h1> Profile</h1>
             {profile &&
                 <div>
                     <p>Your location: {profile.homeLocation.city}</p>
-                    <p>Your favourite artists: {profile.favouriteArtists}</p>
-                    <p>Your bookings: {profile.bookings}</p>
+                    <p>Your favourite artists: </p>
+                    {profile.favouriteArtists.length < 1 ? (
+                        <p><i>Follow some artists for personalised recommendations!</i></p>
+                    ) : (
+                        <ul>
+                            {profile.favouriteArtists.map((artist) => (
+                                <li key={artist}>{artist}</li>
+                            ))}
+                        </ul>
+                    )}
+                    <p>Your bookings: </p>
+                    {profile.bookings.length < 1 ? (
+                        <p><i>No current bookings.</i></p>
+                    ) : (
+                        <ul>
+                            {profile.bookings.map((booking) => {
+                                <li key={booking}>{booking}</li>
+                            })}
+                        </ul>
+                    )}
                     <p>Your name: {session.user.name}</p>
                 </div>
             }

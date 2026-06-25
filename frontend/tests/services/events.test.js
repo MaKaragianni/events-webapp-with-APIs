@@ -24,7 +24,7 @@ describe("events service", () => {
         mockFetch({ events: fakeEvents })
         await getEvents()
         expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/events"),
+        expect.stringContaining("/events"),
         { credentials: "include" }
         )
     })
@@ -83,7 +83,7 @@ describe("events service", () => {
         mockFetch({ event: fakeEvents[0] })
         const result = await getEventById("123")
         expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/events/123"),
+        expect.stringContaining("/events/123"),
         { credentials: "include" }
         )
         expect(result).toEqual({ event: fakeEvents[0] })
