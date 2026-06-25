@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { toggleFavouriteArtists } from "../../services/userProfile";
 
 function formatDate(dateString) {
     return new Date(dateString).toLocaleDateString("en-GB", {
@@ -9,10 +10,13 @@ function formatDate(dateString) {
     });
 }
 
-export default function EventCard({ event }) {
+export default function EventCard({ event, favouriteArtists = [] }) {
     const navigate = useNavigate();
 
     if (!event) return null;
+    
+    // check if this event's artist is already followed
+    const isFollowing = favouriteArtists.includes(event.artist)
 
     function handleClick() {
         navigate(`/events/${event._id}`);
@@ -48,6 +52,14 @@ export default function EventCard({ event }) {
                     {event.venue ? `${event.venue}, ` : ""}
                     {event.city}
                 </p>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        toggleFavouriteArtists(event.artist)
+                    }}
+                >
+                    {isFollowing ? "Following" : "Follow"}
+                </button>
 
             {/* {event.ticketUrl && (
             <a
@@ -61,4 +73,3 @@ export default function EventCard({ event }) {
     </div>    
 );
 }
-// export default EventCard;

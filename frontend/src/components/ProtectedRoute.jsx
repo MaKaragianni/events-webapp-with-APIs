@@ -1,5 +1,6 @@
 import { useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+// just added "Navigate" below as it's used but not imported - zein
+import { useNavigate, Navigate } from "react-router-dom"
 import { authClient } from "../services/authentication"
 
 const ProtectedRoute = ({ children, fallback = null }) => {

@@ -1,7 +1,6 @@
-import { PointerEventsCheckLevel } from "@testing-library/user-event";
 import EventCard from "./EventCard/EventCard";
 
-const EventFeed = ({ events }) => {
+const EventFeed = ({ events, favouriteArtists }) => {
     if (events.length === 0) {
         return <p>No events found</p>
     }
@@ -9,7 +8,7 @@ const EventFeed = ({ events }) => {
     return (
         <div>
             {events.map(event => (
-                <EventCard key={event._id} event={event} />
+                <EventCard key={event._id} event={event} favouriteArtists={favouriteArtists}/>
             ))}
 
     </div>
