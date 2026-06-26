@@ -1,6 +1,15 @@
 const Event = require("../models/event");
 const { ensureEventsForCity } = require("../services/ticketmaster")
+const CityCache = require("../models/cityCache");
 
+const getCities = async (req, res) => {
+    try {
+        const cities = await CityCache.find({}).sort({ city: 1 });
+        res.status(200).json({ cities: cities.map((c) => c.city) });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to fetch cities" });
+    }
+};
 
 const getEvents = async (req, res) => {
     try {
@@ -37,9 +46,6 @@ const getEvents = async (req, res) => {
     }
 }
 
-
-
-
 // GET /events/:id
 // Returns a signle event by its MongoDB _id
 const getEventById = async (req, res) => {
@@ -60,4 +66,4 @@ const getEventById = async (req, res) => {
     }
 };
 
-module.exports = { getEvents, getEventById }
+module.exports = { getEvents, getEventById, getCities }
