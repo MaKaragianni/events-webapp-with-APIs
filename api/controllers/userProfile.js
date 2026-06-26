@@ -45,6 +45,36 @@ const toggleFavouriteArtists = async (req, res) => {
     }
 }
 
+const toggleSavedEvent = async (req, res) => {
+    try {
+        const { eventId } = req.body
+ 
+        if (!eventId) {
+            return res.status(400).json({ error: "Event ID is required" })
+        }
+ 
+        const profile = await UserProfile.findOne({ authUserId: req.user.id })
+ 
+        if (!profile) {
+            return res.status(404).json({ error: "User's profile not found" })
+        }
+ 
+        const isSaved = profile.savedEvents.includes(eventId)
+ 
+        const updatedProfile = await UserProfile.findOneAndUpdate(
+            { authUserId: req.user.id },
+            isSaved
+                ? { $pull: { savedEvents: eventId } }
+                : { $addToSet: { savedEvents: eventId } },
+            { new: true }
+        )
+ 
+        return res.json({ profile: updatedProfile })
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({ error: "Something went wrong" })
+    }
+}
 
 const updateLocation = async (req, res) => {
     try {
@@ -64,4 +94,4 @@ const updateLocation = async (req, res) => {
     }
 }
 
-module.exports = { updateLocation, getMyProfile, toggleFavouriteArtists }
+module.exports = { updateLocation, getMyProfile, toggleFavouriteArtists, toggleSavedEvent }

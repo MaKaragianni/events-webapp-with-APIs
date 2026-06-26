@@ -40,3 +40,14 @@ export const getEventById = async (id) => {
         throw err
     }
 }
+
+export const getCities = async () => {
+    const response = await fetch(`${BACKEND_URL}/events/cities`,{
+        credentials: "include",
+});
+    if (!response.ok) {
+        throw new Error("Failed to fetch cities");
+    }
+
+    return response.json();
+};

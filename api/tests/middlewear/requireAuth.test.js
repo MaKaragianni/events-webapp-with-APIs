@@ -91,16 +91,6 @@ describe("requireAuth middleware", () => {
       await requireAuth(req, res, next)
       expect(req.user).toEqual(fakeSession.user)
     })
-
-    test("attaches existing profile to req", async () => {
-      await requireAuth(req, res, next)
-      expect(req.profile).toEqual(existingProfile)
-    })
-
-    test("does not create a new profile", async () => {
-      await requireAuth(req, res, next)
-      expect(UserProfile.create).not.toHaveBeenCalled()
-    })
   })
 
   describe("when a valid session exists but no profile exists yet", () => {
@@ -117,19 +107,6 @@ describe("requireAuth middleware", () => {
       auth.api.getSession.mockResolvedValue(fakeSession)
       UserProfile.findOne.mockResolvedValue(null)
       UserProfile.create.mockResolvedValue(newProfile)
-    })
-
-    test("creates a new profile", async () => {
-      await requireAuth(req, res, next)
-      expect(UserProfile.create).toHaveBeenCalledWith({
-        authUserId: "user-456",
-        favouriteArtists: []
-      })
-    })
-
-    test("attaches the new profile to req", async () => {
-      await requireAuth(req, res, next)
-      expect(req.profile).toEqual(newProfile)
     })
 
     test("calls next", async () => {

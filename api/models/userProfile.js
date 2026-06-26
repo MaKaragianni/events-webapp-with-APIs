@@ -7,6 +7,7 @@ const UserProfileSchema = new mongoose.Schema({
         unique: true,
     },
     favouriteArtists: { type: [String], default: [] },
+    savedEvents: { type: [String], default: [] }, 
     homeLocation: {
         city: { type: String, default: "Manchester" },
         lat: { type: Number, default: 53.483959},

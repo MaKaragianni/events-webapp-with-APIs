@@ -64,6 +64,7 @@ describe("GET /profile/me", () => {
             long: 0.1276
         });
         expect(response.body.profile.favouriteArtists).toEqual(["Beyonce", "Mariah Carey"]);
+        expect(response.body.profile.savedEvents).toEqual([]);
     });
 
     test("should return 401 if user is not authenticated", async () => {
@@ -123,29 +124,25 @@ describe("PUT /profile/me/location", () => {
 
 describe("PUT /profile/me/favourite-artists", () => {
     test("should update user favourite artists and return 200", async () => {
-        const fakeProfile = createFakeUserProfile();
-        await userProfile.create(fakeProfile);
-
-        const newArtists = ["Taylor Swift", "Kendrick Lamar"];
+        await userProfile.create(createFakeUserProfile());
 
         const response = await request(app)
             .put("/profile/me/favourite-artists")
-            .send({ artists: newArtists });
+            .send({ artist: "Taylor Swift" });
 
         expect(response.status).toBe(200);
-        expect(response.body.profile.favouriteArtists).toEqual(newArtists);
+        expect(response.body.profile.favouriteArtists).toContain("Taylor Swift");
     });
 
-    test("should return 400 if artists is missing", async () => {
-        const fakeProfile = createFakeUserProfile();
-        await userProfile.create(fakeProfile);
+    test("should return 400 if artist is missing", async () => {
+        await userProfile.create(createFakeUserProfile());
 
         const response = await request(app)
             .put("/profile/me/favourite-artists")
             .send({});
 
         expect(response.status).toBe(400);
-        expect(response.body.error).toBe("User must provide artists to update with");
+        expect(response.body.error).toBe("Artist is required");
     });
 
     test("should return 401 if user is not authenticated", async () => {
@@ -155,6 +152,52 @@ describe("PUT /profile/me/favourite-artists", () => {
             .put("/profile/me/favourite-artists")
             .send({ artists: ["Taylor Swift", "Kendrick Lamar"] });
 
+        expect(response.status).toBe(401);
+        expect(response.body.error).toBe("Not authenticated");
+    });
+});
+
+describe("PUT /profile/me/saved-events", () => {
+    test("should save an event and return 200 with updated savedEvents", async () => {
+        await userProfile.create(createFakeUserProfile({ savedEvents: [] }));
+ 
+        const response = await request(app)
+            .put("/profile/me/saved-events")
+            .send({ eventId: "event-abc" });
+ 
+        expect(response.status).toBe(200);
+        expect(response.body.profile.savedEvents).toContain("event-abc");
+    });
+ 
+    test("should remove an already-saved event (toggle off)", async () => {
+        await userProfile.create(createFakeUserProfile({ savedEvents: ["event-abc"] }));
+ 
+        const response = await request(app)
+            .put("/profile/me/saved-events")
+            .send({ eventId: "event-abc" });
+ 
+        expect(response.status).toBe(200);
+        expect(response.body.profile.savedEvents).not.toContain("event-abc");
+    });
+ 
+    test("should return 400 if eventId is missing", async () => {
+        await userProfile.create(createFakeUserProfile());
+ 
+        const response = await request(app)
+            .put("/profile/me/saved-events")
+            .send({});
+ 
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Event ID is required");
+    });
+ 
+    test("should return 401 if user is not authenticated", async () => {
+        auth.api.getSession.mockResolvedValueOnce(null);
+ 
+        const response = await request(app)
+            .put("/profile/me/saved-events")
+            .send({ eventId: "event-abc" });
+ 
         expect(response.status).toBe(401);
         expect(response.body.error).toBe("Not authenticated");
     });

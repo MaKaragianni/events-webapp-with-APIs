@@ -39,3 +39,23 @@ export async function toggleFavouriteArtists(artist) {
         console.error(err)
     }
 }
+
+export async function toggleSavedEvent(eventId) {
+    try {
+        const requestOptions = {
+            method: "PUT",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ eventId })
+        }
+        const response = await fetch(`${BACKEND_URL}/profile/me/saved-events`, requestOptions)
+        if (response.status !== 200) {
+            throw new Error("Unable to toggle saved event");
+        }
+        const data = await response.json();
+        return data;
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
+}

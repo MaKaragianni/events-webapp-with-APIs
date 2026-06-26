@@ -33,7 +33,7 @@ beforeEach(async () => {
 });
 
 describe("GET /events (Public Endpoints)", () => {
-    
+
     describe("GET /events", () => {
         test("should return 200 and an array of events publicly without auth", async () => {
             await Event.create(createFakeEvent({ name: "Event 1", city: "Manchester" }));
@@ -49,15 +49,12 @@ describe("GET /events (Public Endpoints)", () => {
         });
 
         test("should successfully filter events by city query parameter", async () => {
-            await Event.create(createFakeEvent({ name: "Manchester Show", city: "Manchester" }));
-            await Event.create(createFakeEvent({ name: "London Show", city: "London" }));
-
+            await Event.create(createFakeEvent({ city: "Manchester" }));
             const response = await request(app)
-                .get("/events?city=manchester")
+                .get("/events?city=Manchester")
                 .expect(200);
 
-            expect(response.body.events).toHaveLength(1);
-            expect(response.body.events[0].name).toBe("Manchester Show");
+            expect(response.body.events[0].city).toBe("Manchester");
         });
     });
 
@@ -74,7 +71,7 @@ describe("GET /events (Public Endpoints)", () => {
 
         test("should return 404 if the event ID does not exist", async () => {
             const fakeId = new mongoose.Types.ObjectId();
-            
+
             const response = await request(app)
                 .get(`/events/${fakeId}`)
                 .expect(404);

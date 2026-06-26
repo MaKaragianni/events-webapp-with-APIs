@@ -116,6 +116,64 @@ describe("profile controller", () => {
         expect(res.json).toHaveBeenCalledWith({ error: "Artist is required" })
     })
 })
+
+    describe("toggleSavedEvent", () => {
+        test("saves an event if not already saved", async () => {
+            const existingProfile = { authUserId: "user-123", savedEvents: [] }
+            const updatedProfile  = { authUserId: "user-123", savedEvents: ["event-abc"] }
+ 
+            UserProfile.findOne.mockResolvedValue(existingProfile)
+            UserProfile.findOneAndUpdate.mockResolvedValue(updatedProfile)
+            req.body = { eventId: "event-abc" }
+ 
+            await profileController.toggleSavedEvent(req, res)
+ 
+            expect(UserProfile.findOneAndUpdate).toHaveBeenCalledWith(
+                { authUserId: "user-123" },
+                { $addToSet: { savedEvents: "event-abc" } },
+                { new: true }
+            )
+            expect(res.json).toHaveBeenCalledWith({ profile: updatedProfile })
+        })
+ 
+        test("removes a saved event if already saved", async () => {
+            const existingProfile = { authUserId: "user-123", savedEvents: ["event-abc"] }
+            const updatedProfile  = { authUserId: "user-123", savedEvents: [] }
+ 
+            UserProfile.findOne.mockResolvedValue(existingProfile)
+            UserProfile.findOneAndUpdate.mockResolvedValue(updatedProfile)
+            req.body = { eventId: "event-abc" }
+ 
+            await profileController.toggleSavedEvent(req, res)
+ 
+            expect(UserProfile.findOneAndUpdate).toHaveBeenCalledWith(
+                { authUserId: "user-123" },
+                { $pull: { savedEvents: "event-abc" } },
+                { new: true }
+            )
+            expect(res.json).toHaveBeenCalledWith({ profile: updatedProfile })
+        })
+ 
+        test("returns 400 if no eventId provided", async () => {
+            req.body = {}
+ 
+            await profileController.toggleSavedEvent(req, res)
+ 
+            expect(res.status).toHaveBeenCalledWith(400)
+            expect(res.json).toHaveBeenCalledWith({ error: "Event ID is required" })
+        })
+ 
+        test("returns 404 if profile not found", async () => {
+            UserProfile.findOne.mockResolvedValue(null)
+            req.body = { eventId: "event-abc" }
+ 
+            await profileController.toggleSavedEvent(req, res)
+ 
+            expect(res.status).toHaveBeenCalledWith(404)
+            expect(res.json).toHaveBeenCalledWith({ error: "User's profile not found" })
+        })
+    })
+
     describe('updateLocation', () => {
         test('should update the homeLocation object', async () => {
             //updated profile for testing

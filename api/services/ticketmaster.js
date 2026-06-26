@@ -16,18 +16,18 @@ const ensureEventsForCity = async (city) => {
     // find the events for the city
     const cacheEntry = await CityCache.findOne({ city })
 
-    // check how old it is 
+    // check for age and exisitance
     const isStale = !cacheEntry || (Date.now() - cacheEntry.lastRefreshed > SIX_HOURS)
 
-    // if not stale return the outcome 
+    // if not stale and does exisit return out
     if (!isStale) {
         return { city, refreshed: false, reason: "fresh" }
     }
 
-    // get events 
+    // after conditional logic ^ means it IS stale or does not exisit 
     const result = await fetchAndStoreEventsForCity(city)
 
-    // update the cache
+    // update the cache with the new city / refreshed city 
     await CityCache.updateOne(
         { city },
         { lastRefreshed: new Date() },
