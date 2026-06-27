@@ -111,8 +111,6 @@ function updateParam(key, value) {
       <NavBar />
       <h2>Events!</h2>
       {eventsError && <p>Something went wrong loading events.</p>}
-      <LogoutButton />
-
       <section>
         <label>
           City:
