@@ -30,18 +30,15 @@ export function EventPage() {
 
   return (
     <>
-    <NavBar/>
+      <NavBar />
       <h1>{event.name}</h1>
       <p>{event.artist}</p>
       <p>{event.genre}</p>
       <p>{event.city}</p>
       {event.description && <p className="event-description">{event.description}</p>}
       <Link to={event.ticketUrl}>buy tickets</Link>
-<<<<<<< mao
       <Map events={[event]} height={"60vh"} width={"100%"} zoom={18} centre={{ lat: event.venue.location.coordinates[1], lng: event.venue.location.coordinates[0] }} />
-=======
       <Footer />
->>>>>>> main
     </>
   );
 }
