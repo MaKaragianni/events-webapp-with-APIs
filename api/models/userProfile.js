@@ -1,5 +1,21 @@
 const mongoose = require("mongoose")
 
+const savedEventSchema = new mongoose.Schema({
+    eventId:  { type: String, required: true },
+    name:     { type: String, required: true },
+    artist:   { type: String, required: true },
+    date:     { type: Date,   required: true },
+    city:     { type: String, required: true },
+    venue:    { type: String, default: "TBC" },
+    image:    {
+        url:    { type: String },
+        width:  { type: Number },
+        height: { type: Number },
+    },
+    ticketUrl: { type: String },
+    tags:     { type: [String], default: [] },
+}, { _id: false })
+
 const UserProfileSchema = new mongoose.Schema({
     authUserId: {
         type: String,
@@ -7,7 +23,7 @@ const UserProfileSchema = new mongoose.Schema({
         unique: true,
     },
     favouriteArtists: { type: [String], default: [] },
-    savedEvents: { type: [String], default: [] }, 
+    savedEvents: { type: [savedEventSchema], default: [] }, 
     homeLocation: {
         city: { type: String, default: "Manchester" },
         lat: { type: Number, default: 53.483959},
