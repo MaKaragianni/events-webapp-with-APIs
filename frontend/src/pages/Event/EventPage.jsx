@@ -3,6 +3,8 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { getEventById } from "../../services/events";
 import { authClient } from "../../services/authentication";
 
+import Map from "../../components/Map"
+
 export function EventPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -32,6 +34,7 @@ export function EventPage() {
       <p>{event.city}</p>
       {event.description && <p className="event-description">{event.description}</p>}
       <Link to={event.ticketUrl}>buy tickets</Link>
+      <Map events={[event]} height={"60vh"} width={"100%"} zoom={18} centre={{ lat: event.venue.location.coordinates[1], lng: event.venue.location.coordinates[0] }} />
     </>
   );
 }
