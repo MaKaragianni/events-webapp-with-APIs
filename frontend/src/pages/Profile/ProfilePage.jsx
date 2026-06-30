@@ -74,7 +74,7 @@ export function ProfilePage() {
     const [homeLocation, setHomeLocation] = useState(null);
     const [bookings, setBookings] = useState([]);
     const [savedEvents, setSavedEvents] = useState([]);
-    const [isPopoverOpen, setIsPopOverOpen] = useState(false)
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false)
 
     const { data: session } = authClient.useSession();
     const navigate = useNavigate();
@@ -125,7 +125,7 @@ export function ProfilePage() {
             {profile && (
                 <div>
                     <p><strong>Your location:</strong> {homeLocation}</p>
-                    <Popover open={isPopoverOpen} onOpenChange={setIsPopOverOpen}>
+                    <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
                         <PopoverTrigger>
                             <Button>Edit</Button>
                         </PopoverTrigger>
