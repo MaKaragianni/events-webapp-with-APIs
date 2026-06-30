@@ -78,6 +78,12 @@ export async function updateHomeLocation({ city, lat, long }) {
             throw new Error("Unable to update your home location")
         }
         return data.profile.homeLocation.city
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
+}
+    
 /**
  * Records a booking for the given event.
  * Returns the updated profile on success.

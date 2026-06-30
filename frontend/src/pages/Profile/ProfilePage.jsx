@@ -69,7 +69,7 @@ export function ProfilePage() {
             {profile && (
                 <div>
                     <form onSubmit={handleLocationSubmit}>
-                        <p>Your location: {profile.homeLocation.city}</p>
+                        <p>Your location: {homeLocation}</p>
                         <LocationSearch onCitySelect={({ city, lat, lng }) => {
                             setSelectedLocation({ city, lat, lng })
                         }} />
