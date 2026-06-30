@@ -18,17 +18,15 @@ function formatDate(dateStr) {
 
 function formatTime(timeStr) {
     if (!timeStr) return "";
-    if (timeStr.split(":").length === 3) {
-        return timeStr;
-    }
-    return `${timeStr}:00`;
+    const [hours, minutes] = timeStr.split(":");
+    return minutes !== undefined ? `${hours}:${minutes}` : hours;
 }
 
 // Compact card used for both saved events and bookings on the profile page
 function EventSnapshotCard({ item, onClick }) {
     return (
         <li
-            className="event-snapshot-card"
+            className="event-card event-snapshot-card"
             data-testid="event-snapshot-card"
             onClick={onClick}
             role={onClick ? "button" : undefined}
@@ -43,19 +41,21 @@ function EventSnapshotCard({ item, onClick }) {
                 <img
                     src={item.image.url}
                     alt={`${item.name} event image`}
-                    className="event-snapshot-image"
+                    className="event-image"
                     data-testid="event-snapshot-image"
                 />
             )}
-            <div className="event-snapshot-body">
-                <strong className="event-snapshot-artist">{item.artist}</strong>
-                <p className="event-snapshot-name">{item.name}</p>
-                <p className="event-snapshot-venue">{item.venue?.name || item.venue}</p>
-                <p className="event-snapshot-date">
+            <div className="event_body">
+                <h2 className="event_title">{item.name}</h2>
+                <p className="event_artist">{item.artist}</p>
+                <p className="event_datetime">
                     {formatDate(item.date)}
-                    {item.time ? ` · ${formatTime(item.time)}` : ""}
+                    {item.time && ` ${formatTime(item.time)}`}
                 </p>
-                {item.city && <p className="event-snapshot-city">{item.city}</p>}
+                <p className="event_location">
+                    {(item.venue?.name || item.venue) ? `${item.venue?.name || item.venue}, ` : ""}
+                    {item.city}
+                </p>
             </div>
         </li>
     );
@@ -159,7 +159,7 @@ export function ProfilePage() {
                         {upcomingSaved.length === 0 ? (
                             <p><i>No upcoming saved events.</i></p>
                         ) : (
-                            <ul className="event-snapshot-list" data-testid="saved-events-list">
+                            <ul className="event-feed event-snapshot-list" data-testid="saved-events-list">
                                 {upcomingSaved.map((event) => (
                                     <EventSnapshotCard
                                         key={event.eventId}
@@ -176,7 +176,7 @@ export function ProfilePage() {
                         {pastSaved.length === 0 ? (
                             <p><i>No past saved events.</i></p>
                         ) : (
-                            <ul className="event-snapshot-list" data-testid="past-saved-events-list">
+                            <ul className="event-feed event-snapshot-list" data-testid="past-saved-events-list">
                                 {pastSaved.map((event) => (
                                     <EventSnapshotCard
                                         key={event.eventId}
@@ -193,7 +193,7 @@ export function ProfilePage() {
                         {upcomingBookings.length === 0 ? (
                             <p><i>No upcoming bookings.</i></p>
                         ) : (
-                            <ul className="event-snapshot-list" data-testid="bookings-list">
+                            <ul className="event-feed event-snapshot-list" data-testid="bookings-list">
                                 {upcomingBookings.map((booking) => (
                                     <EventSnapshotCard
                                         key={booking._id}
@@ -210,7 +210,7 @@ export function ProfilePage() {
                         {pastBookings.length === 0 ? (
                             <p><i>No past bookings.</i></p>
                         ) : (
-                            <ul className="event-snapshot-list" data-testid="past-bookings-list">
+                            <ul className="event-feed event-snapshot-list" data-testid="past-bookings-list">
                                 {pastBookings.map((booking) => (
                                     <EventSnapshotCard
                                         key={booking._id}

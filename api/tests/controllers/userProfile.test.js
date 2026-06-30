@@ -124,24 +124,40 @@ describe("profile controller", () => {
     describe("toggleSavedEvent", () => {
         test("saves an event if not already saved", async () => {
             const existingProfile = { authUserId: "user-123", savedEvents: [] }
-            const updatedProfile  = { authUserId: "user-123", savedEvents: ["event-abc"] }
- 
+            const updatedProfile  = { authUserId: "user-123", savedEvents: [{ eventId: "64b0c1a2e13f4c001d8b4567", name: "Test Show" }] }
+            
+            const fakeEvent = {
+                _id: "64b0c1a2e13f4c001d8b4567",
+                name: "Test Show",
+                artist: "Test Artist",
+                date: new Date(),
+                city: "London",
+                venue: { name: "O2 Arena" },
+                images: [],
+                tags: []
+            }
+
             UserProfile.findOne.mockResolvedValue(existingProfile)
+            Event.findById = jest.fn().mockResolvedValue(fakeEvent)
             UserProfile.findOneAndUpdate.mockResolvedValue(updatedProfile)
-            req.body = { eventId: "event-abc" }
+            req.body = { eventId: "64b0c1a2e13f4c001d8b4567" }
  
             await profileController.toggleSavedEvent(req, res)
  
             expect(UserProfile.findOneAndUpdate).toHaveBeenCalledWith(
                 { authUserId: "user-123" },
-                { $addToSet: { savedEvents: "event-abc" } },
+                {
+                    $addToSet: {
+                        savedEvents: expect.objectContaining({ eventId: "64b0c1a2e13f4c001d8b4567" })
+                    }
+                },    
                 { new: true }
             )
             expect(res.json).toHaveBeenCalledWith({ profile: updatedProfile })
         })
  
         test("removes a saved event if already saved", async () => {
-            const existingProfile = { authUserId: "user-123", savedEvents: ["event-abc"] }
+            const existingProfile = { authUserId: "user-123", savedEvents: [{ eventId: "event-abc" }] }
             const updatedProfile  = { authUserId: "user-123", savedEvents: [] }
  
             UserProfile.findOne.mockResolvedValue(existingProfile)
@@ -152,7 +168,7 @@ describe("profile controller", () => {
  
             expect(UserProfile.findOneAndUpdate).toHaveBeenCalledWith(
                 { authUserId: "user-123" },
-                { $pull: { savedEvents: "event-abc" } },
+                { $pull: { savedEvents: { eventId: "event-abc" } } },
                 { new: true }
             )
             expect(res.json).toHaveBeenCalledWith({ profile: updatedProfile })
@@ -322,9 +338,13 @@ describe("profile controller", () => {
                         name: "Test Show",
                         artist: "Test Artist",
                         venue: "O2 Arena",
-                        date: futureDate,
+                        date: fakeEvents[0].date,
                         time: "19:00",
-                        isPast: false,
+                        city: undefined,
+                        image: null,
+                        tags: [],
+                        ticketUrl: null,
+                        isPast: false
                     }
                 ]
             })

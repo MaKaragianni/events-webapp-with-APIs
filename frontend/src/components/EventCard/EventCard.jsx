@@ -13,10 +13,8 @@ function formatDate(dateString) {
 
 function formatTime(timeString) {
     if (!timeString) return "";
-    if (timeString.split(":").length === 3) {
-        return timeString;
-    }
-    return `${timeString}:00`;
+    const [hours, minutes] = timeString.split(":");
+    return minutes !== undefined ? `${hours}:${minutes}` : hours;
 }
 
 export default function EventCard({ event, favouriteArtists = [], setFavouriteArtists = () => { }, savedEvents = [], onSavedToggled }) {
