@@ -56,10 +56,10 @@ export function EventPage() {
     try {
       const { ticketUrl } = await getPurchaseLink(id);
       if (ticketUrl) {
-        window.location.href = ticketUrl;
+        window.open(ticketUrl, "_blank", "noopener,noreferrer");
       }
-    } catch {
-      // Ticket URL fetch failing shouldn't block the confirmation
+    } catch (err) {
+      console.error("Redirection tracking error:", err);
     }
   };
 
@@ -152,7 +152,6 @@ export function EventPage() {
       {bookingState === "error" && (
         <p role="alert">Something went wrong. Please try again.</p>
       )}
-      <Link to={event.ticketUrl}>buy tickets</Link>
       <Map events={[event]} height={"60vh"} width={"100%"} zoom={18} centre={{ lat: event.venue.location.coordinates[1], lng: event.venue.location.coordinates[0] }} />
       <Footer />
     </>

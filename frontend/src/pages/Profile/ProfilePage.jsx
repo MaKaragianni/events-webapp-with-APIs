@@ -33,7 +33,10 @@ function EventSnapshotCard({ item, onClick }) {
             role={onClick ? "button" : undefined}
             tabIndex={onClick ? 0 : undefined}
             onKeyDown={onClick ? (e) => e.key === "Enter" && onClick() : undefined}
-            style={{ cursor: onClick ? "pointer" : "default" }}
+            style={{ 
+                cursor: onClick ? "pointer" : "default",
+                listStyleType: "none"
+            }}
         >
             {item.image?.url && (
                 <img
@@ -52,11 +55,6 @@ function EventSnapshotCard({ item, onClick }) {
                     {item.time ? ` · ${formatTime(item.time)}` : ""}
                 </p>
                 {item.city && <p className="event-snapshot-city">{item.city}</p>}
-                {item.isPast && (
-                    <span className="event-snapshot-past-badge" data-testid="past-badge">
-                        Past
-                    </span>
-                )}
             </div>
         </li>
     );
@@ -91,16 +89,34 @@ export function ProfilePage() {
     const upcomingSaved = savedEvents.filter((e) => !e.isPast);
     const pastSaved = savedEvents.filter((e) => e.isPast);
 
+    // Card-styling
+    const listFlexStyle = {
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "1.5rem",
+        padding: 0,
+        margin: "1rem 0"
+    };
+
     return (
         <div>
             <NavBar />
-            <h1>Profile</h1>
+
+            {/* Header section with user's name aligned next to profile context */}
+            <header style={{ borderBottom: "1px solid #eee", paddingBottom: "1rem", marginBottom: "2rem" }}>
+                <h1 style={{ marginBottom: "0.2rem" }}>Profile</h1>
+                {session?.user?.name && (
+                    <p style={{ fontSize: "1.2rem", color: "#070707", margin: 0 }}>
+                        Welcome back, <strong>{session.user.name}</strong>!
+                    </p>
+                )}
+            </header>
 
             {profile && (
                 <div>
-                    <p>Your location: {profile.homeLocation.city}</p>
+                    <p><strong>Your location:</strong> {profile.homeLocation.city}</p>
 
-                    <p>Your favourite artists:</p>
+                    <p><strong>Your favourite artists:</strong></p>
                     {profile.favouriteArtists.length < 1 ? (
                         <p><i>Follow some artists for personalised recommendations!</i></p>
                     ) : (
@@ -177,8 +193,6 @@ export function ProfilePage() {
                             </ul>
                         )}
                     </section>
-
-                    <p>Your name: {session?.user?.name}</p>
                 </div>
             )}
             <Footer />

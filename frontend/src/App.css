@@ -63,12 +63,12 @@
 }
 
 .recommended-events {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(220px, 1fr));
+  display: flex;
+  justify-content: center;
   gap: 2rem;
+  flex-wrap: nowrap;
   width: 100%;
-  max-width: 1800px;
-  margin: 0 auto;
+  overflow-x: auto;
 }
 
 .hero {
