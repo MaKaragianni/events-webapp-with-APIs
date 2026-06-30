@@ -124,12 +124,18 @@ export function FeedPage() {
   if (loading) return <p>Loading events...</p>;
   // if (error) return <p>Something went wrong</p>;
 
+  const handleFirstLoginComplete = async () => {
+    const { profile } = await getMyProfile();
+    setHomeCity(profile.homeLocation?.city || null);
+  }
+
   return (
     <>
       <NavBar />
       <HomeLocationUpdateDialog
         isFirstLoginSession={isFirstLoginSession}
         setIsFirstLoginSession={setIsFirstLoginSession}
+        onCompleted={handleFirstLoginComplete}
       />
 
       <Recommendations

@@ -72,8 +72,6 @@ export function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [homeLocation, setHomeLocation] = useState(null);
-    const [success, setSuccess] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState(null)
     const [bookings, setBookings] = useState([]);
     const [savedEvents, setSavedEvents] = useState([]);
     const [isPopoverOpen, setIsPopOverOpen] = useState(false)

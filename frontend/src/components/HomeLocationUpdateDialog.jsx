@@ -13,12 +13,15 @@ import {
 } from "@/components/ui/dialog"
 
 
-const HomeLocationUpdateDialog = ({isFirstLoginSession, setIsFirstLoginSession}) => {
+const HomeLocationUpdateDialog = ({isFirstLoginSession, setIsFirstLoginSession, onCompleted}) => {
     const [error, setError] = useState(null);
 
     const completeFirstLogin = async () => {
         await updateIsFirstLogin();
         setIsFirstLoginSession(false);
+        if (onCompleted) {
+            await onCompleted();
+        }
     };
 
     const handleClose = async () => {
