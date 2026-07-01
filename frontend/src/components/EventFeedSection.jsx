@@ -45,14 +45,15 @@ function EventFeedSection({ profile , isLoggedIn}) {
   }, [])
 
   useEffect(() => {
-    getEvents({ city, from: new Date(), offset, limit: LIMIT })
+    getEvents({ city, from, to, limit: LIMIT, offset, tag })
       .then((data) => {
+        console.log(data)
         setEvents(data.events)
         setTotalEvents(data.totalEvents)
       })
       .catch((err) => setEventsError(err))
       .finally(() => setLoading(false))
-  }, [city, offset])
+  }, [city, from, to, offset, tag])
 
 
   
@@ -129,6 +130,7 @@ function EventFeedSection({ profile , isLoggedIn}) {
               <PaginationNext 
                 onClick={() => {
                   const isLastPage = currentPageNum >= totalPages;
+                  console.log(currentPageNum)
                   if (isLastPage) return;
 
                   setCurrentPageNum(currentPageNum + 1);

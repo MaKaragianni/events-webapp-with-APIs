@@ -14,7 +14,7 @@ const getCities = async (req, res) => {
 const getEvents = async (req, res) => {
     try {
         // query parameters 
-        const { city, from, to, limit, offset } = req.query
+        const { city, from, to, limit, offset, tag } = req.query
 
         const LIMIT = 10
         const OFFSET = 0
@@ -43,6 +43,7 @@ const getEvents = async (req, res) => {
                 filter.date.$lte = endOfDay
             }
         }
+        if (tag) filter.tags = tag
         const totalEvents = await Event.countDocuments(filter)
         // find the events with matches
         const events = await Event.find(filter).sort({ date: 1 }).skip(parsedOffset).limit(parsedLimit)
