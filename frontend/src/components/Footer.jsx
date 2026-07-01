@@ -1,5 +1,4 @@
 import "./ui/Footer.css";
-
 const teamMembers = [
   { name: "Joe Carroll", github: "https://github.com/jjcrl" },
   { name: "Kit Trowbridge", github: "https://github.com/Kit-Trowbridge" },
@@ -12,7 +11,15 @@ function Footer() {
   const scrollingMembers = [...teamMembers, ...teamMembers];
 
   return (
-    <footer className="footer">
+      <footer className="footer">
+      <a
+        className="footer-repo"
+        href="https://github.com/jjcrl/events-webapp"
+        target="_blank"
+        rel="noreferrer"
+      >
+        🌍 Project Repository
+      </a>
       <div className="footer-brand">
         <span className="footer-logo">En<span>Core</span></span>
         <p>© 2026 EnCore. Built at Makers Academy</p>
@@ -25,9 +32,14 @@ function Footer() {
           <ul>
             {scrollingMembers.map((member, index) => (
               <li key={`${member.name}-${index}`}>
-                <a href={member.github} target="_blank" rel="noreferrer">
-                {member.name} <span className="footer-link-icon">↗</span>
-              </a>
+              <a
+              href={member.github}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {member.name}
+              <span className="footer-icon">🔗</span>
+</a>
               </li>
             ))}
           </ul>
