@@ -133,7 +133,7 @@ export function ProfilePage() {
                             <HomeLocationForm 
                                 onLocationUpdated={(updatedCity) => {
                                     setHomeLocation(updatedCity)
-                                    setIsPopOverOpen(false)
+                                    setIsPopoverOpen(false)
                                 }}
                             />
                         </PopoverContent>

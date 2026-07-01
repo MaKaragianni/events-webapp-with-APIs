@@ -13,30 +13,37 @@ import {
 } from "@/components/ui/dialog"
 
 
-const HomeLocationUpdateDialog = ({isFirstLoginSession, setIsFirstLoginSession, onCompleted}) => {
+const HomeLocationUpdateDialog = ({profile, setNewHomeLocation}) => {
     const [error, setError] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(profile.isFirstLogin)
 
-    const completeFirstLogin = async () => {
+    const setFirstLoginToFalse = async () => {
         await updateIsFirstLogin();
-        setIsFirstLoginSession(false);
-        if (onCompleted) {
-            await onCompleted();
+    }
+    
+    const completeFirstLogin = async () => {
+        await setFirstLoginToFalse();
+        setDialogOpen(false);
+        if (setNewHomeLocation) {
+            await setNewHomeLocation();
         }
     };
 
+    // this will remove the dialog from that point on without re-fetching the profile
+    // (since no changes were made to user's home location)
     const handleClose = async () => {
         try {
-            await completeFirstLogin();
+            await setFirstLoginToFalse();
+            setDialogOpen(false);
         } catch (err) {
             setError(err);
+            console.log(err)
         }
     }
     
     return(
-            // updates isFirstLogin when dialog closed with X button
-            // <Dialog open={isFirstLoginSession}>
             <Dialog 
-                open={isFirstLoginSession} 
+                open={dialogOpen} 
                 onOpenChange={(open) => {
                     if (!open) {
                         handleClose();

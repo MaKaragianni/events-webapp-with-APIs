@@ -12,16 +12,17 @@ const HomeLocationForm = ({ onLocationUpdated }) => {
         if (!selectedLocation) return
         try {
             const updatedCity = await updateHomeLocation({ 
-                city: selectedLocation.city, 
-                lat: selectedLocation.lat, 
-                long: selectedLocation.lng
-            })
-            if (onLocationUpdated) {
-                onLocationUpdated(updatedCity)
-            }
+            city: selectedLocation.city, 
+            lat: selectedLocation.lat, 
+            long: selectedLocation.lng
+        })
+        if (onLocationUpdated) {
+            onLocationUpdated(updatedCity)
+        }
             
         } catch (err) {
             setError(err)
+            console.log(err)
         }
     }
     
