@@ -7,30 +7,23 @@ function formatDate(dateString) {
         weekday: "short",
         day: "numeric",
         month: "short",
-        year: "numeric",
     });
 }
 
 function formatTime(timeString) {
     if (!timeString) return "";
-    if (timeString.split(":").length === 3) {
-        return timeString;
-    }
-    return `${timeString}:00`;
+    const [hours, minutes] = timeString.split(":");
+    return minutes !== undefined ? `${hours}:${minutes}` : hours;
 }
 
-export default function EventCard({ event, favouriteArtists = [], setFavouriteArtists = () => { }, savedEvents = [], onSavedToggled }) {
+export default function EventCard({ event, favouriteArtists, savedEvents, isLoggedIn }) {
     const navigate = useNavigate();
-    const { data: session, isPending } = authClient.useSession();
-
+    // const { data: session, isPending } = authClient.useSession();
     if (!event) return null;
 
     // check if this event's artist is already followed
     const isFollowing = favouriteArtists.includes(event.artist);
-    const isSaved = savedEvents.some(
-        (saved) =>
-            (typeof saved === "object" ? saved.eventId : saved) === event._id
-    );
+    const isSaved = savedEvents.includes(event._id);
 
     function handleCardClick() {
         navigate(`/events/${event._id}`);
@@ -38,12 +31,11 @@ export default function EventCard({ event, favouriteArtists = [], setFavouriteAr
 
     async function handleSaveToFavourites(e) {
         e.stopPropagation(); // Handles the click on the button without triggering other click handlers
-        if (!session && !isPending) {
+        if (!isLoggedIn) {
             navigate("/login");
             return;
         }
         await toggleSavedEvent(event._id);
-        if (onSavedToggled) onSavedToggled(event._id);
     }
 
     function pickEventCardImage(images) {
@@ -72,63 +64,34 @@ export default function EventCard({ event, favouriteArtists = [], setFavouriteAr
             onKeyDown={(e) => e.key === "Enter" && handleCardClick()}
             data-testid="event-card"
         >
-            {event.images && (
-                <img
-                    src={sizes.url}
-                    alt={`${event.name} image`}
-                    className="event-image"
-                />
-            )}
+            <div className="card-image-wrap">
+                {event.images && (
+                    <img
+                        src={sizes.url}
+                        alt={`${event.name} image`}
+                        className="event-image"
+                    />
+                )}
+                <button
+                    className="save-event-btn"
+                    data-testid="save-event-btn"
+                    onClick={handleSaveToFavourites}
+                    aria-label={isSaved ? "Remove from saved events" : "Save event"}
+                    title={isSaved ? "Remove from saved events" : "Save event"}
+                >
+                    {isSaved ? "♥" : "♡"}
+                </button>
+
+            </div>
 
             <div className="event_body">
-                <h2 className="event_title">{event.name}</h2>
-                <p className="event_artist">{event.artist}</p>
-                {(event.tags || []).map((tag, index) => (
-                    <p key={index}>{tag}</p>
-                ))}
+                <p className="event_title">{event.name}</p>
                 <p className="event_datetime">
                     {formatDate(event.date)}
-                    {/* {event.time && `· ${event.time}`} */}
-                    {event.time && ` ${formatTime(event.time)}`}
                 </p>
                 <p className="event_location">
-                    {event.venue?.name ? `${event.venue.name}, ` : ""}
-                    {event.city}
-
+                    {event.venue?.name ? `${event.venue.name}` : ""}
                 </p>
-
-                <div className="event_actions">
-                    {/* Save event to favourites */}
-                    <button
-                        className="save-event-btn"
-                        data-testid="save-event-btn"
-                        onClick={handleSaveToFavourites}
-                        aria-label={isSaved ? "Remove from saved events" : "Save event"}
-                        title={isSaved ? "Remove from saved events" : "Save event"}
-                    >
-                        {isSaved ? "♥" : "♡"}
-                    </button>
-
-                    {/* Follow artist */}
-                    <button
-                        className="follow-artist-btn"
-                        data-testid="follow-artist-btn"
-                        onClick={async (e) => {
-                            e.stopPropagation();
-                            if (!session) {
-                                navigate("/login");
-                            } else {
-                                // toggleFavouriteArtists(event.artist);
-                                const newFavouriteArtists = await toggleFavouriteArtists(event.artist)
-                                // setFavouriteArtists(newFavouriteArtists)
-                                if (setFavouriteArtists) setFavouriteArtists(newFavouriteArtists)
-
-                            }
-                        }}
-                    >
-                        {isFollowing ? "Following" : "Follow"}
-                    </button>
-                </div>
             </div>
         </div>
     );

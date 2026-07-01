@@ -75,6 +75,19 @@ describe("EventCard", () => {
             expect(image.getAttribute("src")).toBe(event.images[0].url);
         });
 
+        test("formats a time with seconds (HH:MM:SS) as HH:MM", () => {
+            renderCard({ event: { ...event, time: "19:00:00" } });
+ 
+            expect(screen.getByText(/19:00$/)).toBeTruthy();
+            expect(screen.queryByText(/19:00:00/)).toBeNull();
+        });
+ 
+        test("leaves a time already in HH:MM format unchanged", () => {
+            renderCard({ event: { ...event, time: "19:00" } });
+ 
+            expect(screen.getByText(/19:00$/)).toBeTruthy();
+        });
+
         test("renders nothing if event is missing", () => {
             const { container } = render(<EventCard event={null} />);
             expect(container.innerHTML).toBe("");

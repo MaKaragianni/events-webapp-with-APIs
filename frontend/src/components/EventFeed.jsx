@@ -1,6 +1,6 @@
 import EventCard from "./EventCard/EventCard";
 
-const EventFeed = ({ events, favouriteArtists, setFavouriteArtists, savedEvents = [], onSavedToggled }) => {
+const EventFeed = ({ events, favouriteArtists, savedEvents, isLoggedIn }) => {
     if (events.length === 0) {
         return <p>No events found</p>;
     }
@@ -12,9 +12,8 @@ const EventFeed = ({ events, favouriteArtists, setFavouriteArtists, savedEvents 
                     key={event._id}
                     event={event}
                     favouriteArtists={favouriteArtists}
-                    setFavouriteArtists={setFavouriteArtists}
                     savedEvents={savedEvents}
-                    onSavedToggled={onSavedToggled}
+                    isLoggedIn={isLoggedIn}
                 />
             ))}
         </div>
