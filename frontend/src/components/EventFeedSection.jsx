@@ -4,25 +4,31 @@ import { getEvents, getCities } from "../services/events"
 import EventFeed from "./EventFeed"
 import EventFilters from "./EventFilters"
 import { useNavigate } from "react-router-dom"
-
-
-function EventFeedSection({ profile , isLoggedIn}) {
+import { MapPinned } from "lucide-react"
+import { format } from "date-fns"
+function EventFeedSection({ profile, isLoggedIn }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const [events, setEvents] = useState([])
   const [eventsError, setEventsError] = useState()
   const [cities, setCities] = useState([])
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
-  const city = searchParams.get("city") || profile?.homeLocation?.city ||"Manchester"
-  const from = searchParams.get("from") || new Date()
+
+  const city = searchParams.get("city") || profile?.homeLocation?.city || "Manchester"
+  const from = searchParams.get("from") || ""
   const to = searchParams.get("to") || ""
   const tag = searchParams.get("tag") || ""
 
-  function updateParam(key, value) {
-    const nextParams = new URLSearchParams(searchParams)
-    if (value) nextParams.set(key, value)
-    else nextParams.delete(key)
-    setSearchParams(nextParams)
+
+  function updateParam(updates) {
+    setSearchParams((prev) => {
+      const nextParams = new URLSearchParams(prev)
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value) nextParams.set(key, value)
+        else nextParams.delete(key)
+      })
+      return nextParams
+    })
   }
 
   useEffect(() => {
@@ -32,7 +38,7 @@ function EventFeedSection({ profile , isLoggedIn}) {
   }, [])
 
   useEffect(() => {
-    getEvents({ city, from: new Date() })
+    getEvents({ city, from: format(new Date(), "yyyy-MM-dd"), to })
       .then((data) => setEvents(data.events))
       .catch((err) => setEventsError(err))
       .finally(() => setLoading(false))
@@ -74,8 +80,14 @@ function EventFeedSection({ profile , isLoggedIn}) {
         topTags={topTags}
         onChange={updateParam}
       />
-      <h1 className="events-title">{`Popular events in ${city}`}  <button onClick={(() => (navigate("/explore")))}>explore</button> </h1>
-     
+      <div className="flex flex-row gap-5 items-center">
+
+        <div className="flex flex-row gap-2 items-center py-3">
+          <p className="text-primary font-semibold text-5xl py-2">{`Popular Events`}</p>
+          <p className="text-secondary font-semibold text-5xl py-2">{`in ${city}`}</p>
+        </div>
+        <MapPinned className="text-secondary translate-y-0.5" size={36} onClick={(() => (navigate("/explore")))} />
+      </div>
       <EventFeed
         events={filteredEvents}
         favouriteArtists={profile?.favouriteArtists || []}
