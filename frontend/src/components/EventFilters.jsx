@@ -15,7 +15,7 @@ export default function EventFilters({
 
   return (
 
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 mb-2">
       <section className="flex flex-row gap-3 pb-2 pl-3">
         <CityCombobox city={city} cities={cities} onChange={onChange} />
         <DateRangeFilter from={from} to={to} onChange={onChange} />
