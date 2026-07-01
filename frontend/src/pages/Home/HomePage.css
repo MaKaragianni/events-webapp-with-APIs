@@ -2,19 +2,122 @@
   display: flex;
   flex-direction: column;
 }
-.home {
-  display: flex;
-  flex-direction: column;
-}
 
 .hero {
   background: #071b39;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 30px 50px;
-  gap: 48px;
-  margin: 0 auto;
+  padding: 30px 64px;
+  gap: 32px;
+  width: 100%;
+  box-sizing: border-box;
+
+  min-height: unset;
+  height: 520px;
+}
+
+.hero-left {
+  flex: 1;
+  max-width: 460px;       /* slightly narrower to match design */
+}
+
+.hero-subtitle {
+  color: #e65386;
+  font-size: 15x;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 12px;       /* tighter gap below subtitle */
+}
+
+.hero-left h1 {
+  color: white;
+  font-size: 40px;        /* slightly bigger to match design */
+  font-weight: 900;
+  line-height: 1.05;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+}
+
+.hero-left h1 span {
+  color: #e65386;
+}
+
+.hero-description {
+  color: #aeb8c8;
+  font-size: 14px;        /* smaller to match design */
+  line-height: 1.6;
+  margin: 0 0 24px;       /* tighter gap */
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.hero-btn-primary {
+  background: #e65386;
+  color: white;
+  padding: 12px 24px;     /* slightly smaller buttons */
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.hero-btn-secondary {
+  background: transparent;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  border: 2px solid white;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.hero-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.hero-artwork-placeholder {
+  position: relative;
+  width: 240px;
+  height: 200px;
+}
+
+.hero-artwork-card {
+  position: absolute;
+  background: #1a2f55;
+  border-radius: 12px;
+}
+
+.hero-artwork-card.large {
+  width: 180px;
+  height: 145px;
+  top: 0;
+  left: 0;
+}
+
+.hero-artwork-card.small {
+  width: 155px;
+  height: 120px;
+  bottom: 0;
+  right: 0;
+}
+
+/* .hero {
+  background: #071b39;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 50px 15px;
+  min-height: 360px;
+  gap: 30px;
+  margin: auto;
 }
 
 .hero-left {
@@ -85,8 +188,8 @@
 
 .hero-artwork-placeholder {
   position: relative;
-  width: 320px;
-  height: 280px;
+  width: 260px;
+  height: 220px;
 }
 
 .hero-artwork-card {
@@ -107,4 +210,4 @@
   height: 130px;
   bottom: 0;
   right: 0;
-}
+} */
