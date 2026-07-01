@@ -1,6 +1,7 @@
 import LogoutButton from "./LogoutButton";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { authClient } from "../services/authentication";
+import pinkLogo from "../assets/logo-secondary.svg"
 
 
 // need to make logout button dynamic (login / logout) checking session exists
@@ -15,9 +16,10 @@ const NavBar = () => {
     if (isPending) return null;
 
     return (
-        <nav className="flex items-center justify-between px-8 py-4 bg-primary">
+        <nav className="flex items-center justify-between px-8 py-4 bg-navbar">
             <Link to="/" className="font-heading text-xl text-primary-foreground tracking-tight">
-                <span className="text-secondary">EnCore</span>
+                <img src={pinkLogo} alt="enCore Logo" className="h-8"/>
+                {/* <span className="text-secondary">EnCore</span> */}
             </Link>
 
             <div className="flex items-center gap-6 text-sm">

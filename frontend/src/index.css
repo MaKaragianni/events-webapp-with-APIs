@@ -7,6 +7,13 @@
 
 :root {
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --navbar-gradient:
+    radial-gradient(
+      circle at top right,
+      oklch(0.622 0.167 2.522 / 0.18) 0%,
+      transparent 45%
+    ),
+    var(--primary);
   --background: oklch(0.985 0.003 84.559);
   --foreground: oklch(0.218 0 0);
   --card: oklch(1 0 0);
@@ -157,5 +164,11 @@ h1 {
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .bg-navbar {
+    background: var(--navbar-gradient);
   }
 }
