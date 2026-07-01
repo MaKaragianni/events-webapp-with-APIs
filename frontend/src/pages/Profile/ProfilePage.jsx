@@ -92,8 +92,6 @@ export function ProfilePage() {
     const [error, setError] = useState(null);
     const [homeLocation, setHomeLocation] = useState(null);
     const [success, setSuccess] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState(null)
-    const [editingLocation, setEditingLocation] = useState(false)
     const [bookings, setBookings] = useState([]);
     const [savedEvents, setSavedEvents] = useState([]);
     const [isPopoverOpen, setIsPopoverOpen] = useState(false)
@@ -112,25 +110,6 @@ export function ProfilePage() {
             .catch((err) => setError(err))
             .finally(() => setLoading(false));
     }, []);
-
-
-    const handleLocationSubmit = async (e) => {
-        e.preventDefault()
-        if (!selectedLocation) return
-        try {
-            const updatedCity = await updateHomeLocation({
-                city: selectedLocation.city,
-                lat: selectedLocation.lat,
-                long: selectedLocation.lng  // Geoapify uses lng, backend expects long
-            })
-            setHomeLocation(updatedCity)
-            setSuccess(true)
-            setEditingLocation(false)
-            setSelectedLocation(null)
-        } catch (err) {
-            setError(err)
-        }
-    }
 
     if (error) return <p>{error.message}</p>;
     if (loading) return <p>Loading profile…</p>;
@@ -151,84 +130,50 @@ export function ProfilePage() {
             <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
                 <h1 className="sr-only">Profile</h1>
 
-            {profile && (
-                <div>
-                    <p><strong>Your location:</strong> {homeLocation}</p>
-                    <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-                        <PopoverTrigger>
-                            <Button>Edit</Button>
-                        </PopoverTrigger>
-                        <PopoverContent>
-                            <HomeLocationForm 
-                                onLocationUpdated={(updatedCity) => {
-                                    setHomeLocation(updatedCity)
-                                    setIsPopoverOpen(false)
-                                }}
-                            />
-                        </PopoverContent>
-                    </Popover>
-
-                    <p><strong>Your favourite artists:</strong> </p>
-                    {profile.favouriteArtists.length < 1 ? (
-                        <p><i>Follow some artists for personalised recommendations!</i></p>
-                {/* Header card — first name + home location, with location editing at the top */}
-                <div className="flex flex-col gap-4 rounded-2xl bg-primary px-6 py-6 md:flex-row md:items-center md:justify-between md:px-8 md:py-7">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-secondary font-heading text-xl text-secondary-foreground normal-case">
-                            {avatarLetter}
-                        </div>
-                        <div>
-                            <p className="text-lg font-semibold text-primary-foreground">{firstName}</p>
-                            <p className="text-sm text-primary-foreground/70">
-                                {homeLocation || "No location set"}
-                            </p>
-                        </div>
-                    </div>
-
-                    {!editingLocation ? (
-                        <button
-                            type="button"
-                            onClick={() => setEditingLocation(true)}
-                            className="shrink-0 self-start rounded-md border border-primary-foreground/20 px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:border-primary-foreground/40 hover:bg-primary-foreground/10 md:self-auto"
-                        >
-                            Update location
-                        </button>
-                    ) : (
-                        <form
-                            onSubmit={handleLocationSubmit}
-                            className="flex flex-wrap items-center gap-2 md:flex-nowrap"
-                        >
-                            <div className="w-full min-w-[14rem] sm:w-56">
-                                <LocationSearch onCitySelect={({ city, lat, lng }) => {
-                                    setSelectedLocation({ city, lat, lng })
-                                }} />
-                            </div>
-                            <button
-                                type="submit"
-                                className="shrink-0 rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/90"
-                            >
-                                Save
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setEditingLocation(false)
-                                    setSelectedLocation(null)
-                                }}
-                                className="shrink-0 text-sm text-primary-foreground/70 transition-colors hover:text-primary-foreground"
-                            >
-                                Cancel
-                            </button>
-                        </form>
-                    )}
-                </div>
-
-                {success && (
-                    <p className="mt-3 text-sm font-medium text-secondary">Your home location has been updated.</p>
-                )}
-
                 {profile && (
                     <div>
+                        {/* Header card — first name + home location, with location editing at the top */}
+                        <div className="flex flex-col gap-4 rounded-2xl bg-primary px-6 py-6 md:flex-row md:items-center md:justify-between md:px-8 md:py-7">
+                            <div className="flex items-center gap-4">
+                                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-secondary font-heading text-xl text-secondary-foreground normal-case">
+                                    {avatarLetter}
+                                </div>
+                                <div>
+                                    <p className="text-lg font-semibold text-primary-foreground">{firstName}</p>
+                                    <p className="text-sm text-primary-foreground/70">
+                                        {homeLocation || "No location set"}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                                <PopoverTrigger
+                                    render={
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="shrink-0 self-start md:self-auto"
+                                        />
+                                    }
+                                >
+                                    Update location
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                    <HomeLocationForm
+                                        onLocationUpdated={(updatedCity) => {
+                                            setHomeLocation(updatedCity)
+                                            setSuccess(true)
+                                            setIsPopoverOpen(false)
+                                        }}
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+
+                        {success && (
+                            <p className="mt-3 text-sm font-medium text-secondary">Your home location has been updated.</p>
+                        )}
+
                         {/* Favourite artists */}
                         <section className="mt-8">
                             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">

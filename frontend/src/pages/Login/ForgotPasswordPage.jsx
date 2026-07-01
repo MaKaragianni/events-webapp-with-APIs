@@ -17,9 +17,9 @@ export function ForgotPasswordPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError(null)
-    const { error } = await authClient.forgetPassword({
+    const { error } = await authClient.requestPasswordReset({
       email,
-      redirectTo: '/reset-password'
+      redirectTo: `${window.location.origin}/reset-password`
     })
     if (error) {
       setError(error.message)

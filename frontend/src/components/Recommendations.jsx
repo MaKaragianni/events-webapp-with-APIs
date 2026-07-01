@@ -9,7 +9,7 @@ console.log('profile:', profile)
     const [loading,setLoading] = useState(true)
 
     useEffect(() => {
-        if (!profile?.homeLocation?.city) return null;
+        if (!profile?.homeLocation?.city) return;
         getEvents({
             city: profile?.homeLocation?.city,
             from: new Date(),

@@ -53,7 +53,9 @@ export default function EventCard({ event, favouriteArtists, savedEvents, isLogg
         );
     }
 
-    let sizes = pickEventCardImage(event.images)
+    let sizes = event.images && event.images.length > 0 
+    ? pickEventCardImage(event.images) 
+    : null;
 
     return (
         <div
@@ -65,7 +67,7 @@ export default function EventCard({ event, favouriteArtists, savedEvents, isLogg
             data-testid="event-card"
         >
             <div className="card-image-wrap">
-                {event.images && (
+                {sizes && sizes.url && (
                     <img
                         src={sizes.url}
                         alt={`${event.name} image`}
@@ -87,7 +89,7 @@ export default function EventCard({ event, favouriteArtists, savedEvents, isLogg
             <div className="event_body">
                 <p className="event_title">{event.name}</p>
                 <p className="event_datetime">
-                    {formatDate(event.date)}
+                    {formatDate(event.date)} {formatTime(event.time)}
                 </p>
                 <p className="event_location">
                     {event.venue?.name ? `${event.venue.name}` : ""}
