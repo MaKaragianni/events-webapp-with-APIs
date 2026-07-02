@@ -30,7 +30,7 @@ const NavBar = () => {
 
             <div className="flex items-center gap-6 text-sm">
                 <Link to="/feed" className={navLinkClass(pathname === "/feed")}>
-                    Feed
+                    Events
                 </Link>
 
                 <Link to="/explore" className={navLinkClass(pathname === "/explore")}>
