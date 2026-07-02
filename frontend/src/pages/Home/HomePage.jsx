@@ -19,19 +19,18 @@ export function HomePage() {
 
   const fallbackCities = ["London", "Manchester", "Bristol", "Liverpool", "Glasgow"];
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   useEffect(() => {
     if (!isPending && session?.user) {
       getMyProfile()
         .then(({ profile }) => {
           const city = profile.homeLocation?.city;
           if (city) {
-            return getEvents({ city }).then((data) => {
-              const today = new Date();
-              const upcomingEvents = (data.events || []).filter((event) => {
-                return new Date(event.date) >= today;
-              });
-              setHomeEvents(upcomingEvents);
-              });
+            return getEvents({ city, from: today.toISOString() }).then((data) => {
+              setHomeEvents(data.events || []);
+            });
           }
         })
         .catch((err) => console.error("Profile/home events failed:", err));
@@ -39,9 +38,16 @@ export function HomePage() {
   }, [session, isPending]);
 
   useEffect(() => {
-    Promise.all(fallbackCities.map((city) => getEvents({ city })))
+    Promise.all(
+      fallbackCities.map((city) =>
+        getEvents({ city, from: today.toISOString() })
+      )
+    )
       .then((results) => {
-        const events = results.flatMap((result) => result.events || []);
+        const events = results
+          .flatMap((result) => result.events || [])
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+
         setUkEvents(events);
       })
       .catch((err) => console.error("UK events failed:", err));
