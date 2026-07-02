@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getEventById, getPurchaseLink } from "../../services/events";
-import { addBooking } from "../../services/userProfile";
+import { addBooking, getMyProfile } from "../../services/userProfile";
 import { authClient } from "../../services/authentication";
 import Footer from "../../components/Footer";
 import NavBar from "../../components/NavBar";
@@ -44,6 +44,18 @@ export function EventPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    if (!session || !event) return;
+    getMyProfile()
+      .then(({ profile }) => {
+        setIsSaved(profile.savedEvents.some((e) => e.eventId === event._id));
+        setIsArtistFaved(profile.favouriteArtists.includes(event.artist));
+      })
+      .catch(() => {
+        // Non-critical — buttons just default to their "not saved/followed" state
+      });
+  }, [session, event]);
+
   const handleBuyTickets = async () => {
     // Redirect to login if not authenticated
     if (!session) {
@@ -60,13 +72,13 @@ export function EventPage() {
       await addBooking(id);
       setBookingState("booked");
       setShowConfirmation(true);
-      return;
     } catch (err) {
       if (err.message === "already_booked") {
         setBookingState("already_booked");
         setShowConfirmation(true);
       } else {
         setBookingState("error");
+        return; // genuine failure — don't attempt the redirect
       }
     }
 
@@ -264,8 +276,14 @@ export function EventPage() {
               <TicketCheck/>
               {buttonLabel()}
             </Button>
-            <Button onClick={handleSaveArtist} disabled={isPending} variant="secondary"><UserPlus />Follow Artist</Button>
-            <Button onClick={handleSaveToFavourites} disabled={isPending} variant="secondary" ><Bookmark />Bookmark Event</Button>
+            <Button onClick={handleSaveArtist} disabled={isPending} variant="secondary">
+              <UserPlus />
+              {isArtistFaved ? "Unfollow Artist" : "Follow Artist"}
+            </Button>
+            <Button onClick={handleSaveToFavourites} disabled={isPending} variant="secondary">
+              <Bookmark fill={isSaved ? "currentColor" : "none"} />
+              {isSaved ? "Remove Bookmark" : "Bookmark Event"}
+            </Button>
           </div>
 
         </div>
