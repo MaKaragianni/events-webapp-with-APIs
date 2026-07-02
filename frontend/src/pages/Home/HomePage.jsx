@@ -66,7 +66,7 @@ export function HomePage() {
             <p className="hero-description">
               enCore tracks the artists you love and surfaces every gig worth knowing about.
             </p>
-             <div className="hero-buttons">
+            <div className="hero-buttons">
               {isLoggedIn ? (
                 <Link
                   to="/feed"
@@ -87,7 +87,7 @@ export function HomePage() {
             }
         right={
 
-          <img src={gradientLogo} alt="enCore logo"/>
+          <img src={gradientLogo} alt="enCore logo" className="h-48"/>
 
         }
       />

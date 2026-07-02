@@ -80,7 +80,7 @@
 .hero-right {
   flex: 1;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .hero-artwork-placeholder {
