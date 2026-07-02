@@ -117,7 +117,7 @@ export function LoginPage() {
             </form>
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
-              New to EnCore?{" "}
+              New to enCore?{" "}
               <button
                 type="button"
                 data-testid="toggle-auth"

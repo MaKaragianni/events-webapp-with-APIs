@@ -167,7 +167,7 @@ export function EventPage() {
       <Dialog open={showAuthPrompt} onOpenChange={setShowAuthPrompt}>
         <DialogContent className="sm:max-w-[400px] text-center">
           <DialogHeader>
-            <DialogTitle>Join EnCore</DialogTitle>
+            <DialogTitle>Join enCore</DialogTitle>
             <DialogDescription>
               Create an account to start following artists, saving events,
               and booking tickets.
