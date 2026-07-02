@@ -15,7 +15,7 @@ export function HomePage() {
   const [homeEvents, setHomeEvents] = useState([]);
   const [ukEvents, setUkEvents] = useState([]);
   const { data: session, isPending } = authClient.useSession();
-  const getStartedLink = session?.user ? "/feed" : "/login";
+  const isLoggedIn = !!session?.user;
 
   const fallbackCities = ["London", "Manchester", "Bristol", "Liverpool", "Glasgow"];
 
@@ -66,20 +66,22 @@ export function HomePage() {
             <p className="hero-description">
               enCore tracks the artists you love and surfaces every gig worth knowing about.
             </p>
-              <div className="hero-buttons">
-              <Link
-                to={getStartedLink}
-                className="hero-btn-primary"
-              >
-                Get started
-              </Link>
-
-              <Link
-                to="/feed"
-                className="hero-btn-secondary"
-              >
-                Browse events
-              </Link>
+             <div className="hero-buttons">
+              {isLoggedIn ? (
+                <Link
+                  to="/feed"
+                  className="hero-btn-secondary"
+                >
+                  Browse events
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  className="hero-btn-primary"
+                >
+                  Get started
+                </Link>
+              )}
             </div>
               </>
             }
