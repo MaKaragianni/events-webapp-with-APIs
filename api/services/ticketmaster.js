@@ -25,13 +25,21 @@ const ensureEventsForCity = async (city) => {
     }
 
     // after conditional logic ^ means it IS stale or does not exisit 
-    const result = await fetchAndStoreEventsForCity(city)
 
     // update the cache with the new city / refreshed city 
+    const result = await fetchAndStoreEventsForCity(city)
+
+    const hasUsableEvents =
+    result.fetched > 0 || result.upserted > 0 || result.modified > 0
+
+    if (!hasUsableEvents) {
+    return { city, refreshed: false, reason: "no usable events fetched" }
+    }
+
     await CityCache.updateOne(
-        { city },
-        { lastRefreshed: new Date() },
-        { upsert: true }
+    { city },
+    { lastRefreshed: new Date() },
+    { upsert: true }
     )
 
     // return the outcome
@@ -41,13 +49,19 @@ const ensureEventsForCity = async (city) => {
 const fetchAndStoreEventsForCity = async (city) => {
 
     // search parameters
-    const params = new URLSearchParams({
+        const now = new Date()
+        const thirtyDaysLater = new Date()
+        thirtyDaysLater.setDate(now.getDate() + 30)
+
+        const params = new URLSearchParams({
         apikey: process.env.TICKETMASTER_API_KEY,
         city,
         sort: "date,asc",
-        size: "20",
+        size: "50",
         classificationName: "Music",
-    })
+        startDateTime: now.toISOString().replace(/\.\d{3}Z$/, "Z"),
+        endDateTime: thirtyDaysLater.toISOString().replace(/\.\d{3}Z$/, "Z"),
+        })
 
     const url = `https://app.ticketmaster.com/discovery/v2/events.json?${params}`
     const response = await fetch(url)
