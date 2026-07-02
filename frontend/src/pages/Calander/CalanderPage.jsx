@@ -77,13 +77,15 @@ function CalendarPage() {
                 const { events } = await getEvents({
                     city: profile.homeLocation.city || "Manchester",
                     from: from,
-                    to: to
+                    to: to,
+                    limit: 0
                 })
                 return setEvents(events)
             })
             .catch((e) => console.log(e))
             .finally(() => setLoading(false))
     }, [])
+
 
     return (
         <div className="flex flex-col h-screen w-screen">
