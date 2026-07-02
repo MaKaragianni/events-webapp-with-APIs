@@ -25,6 +25,51 @@ vi.mock("react-router-dom", async () => {
     };
 });
 
+vi.mock("@/services/events", () => ({
+    getEvents: vi.fn().mockResolvedValue({
+        events: [
+            {
+                _id: "1",
+                name: "Coldplay Live",
+                artist: "Coldplay",
+                tags: ["Pop"],
+                date: "2026-08-01",
+                time: "19:00:00",
+                city: "Manchester",
+                venue: { name: "AO Arena" },
+                images: [{ url: "https://example.com/coldplay.jpg", width: 1280, height: 720 }],
+            },
+            {
+                _id: "2",
+                name: "Indie Night",
+                artist: "Wet Leg",
+                tags: ["Pop"],
+                date: "2026-09-01",
+                time: "20:00:00",
+                city: "Manchester",
+                venue: { name: "O2 Ritz" },
+                images: [{ url: "https://example.com/wetleg.jpg", width: 1280, height: 720 }],
+            },
+            {
+                _id: "3",
+                name: "Already Saved Show",
+                artist: "Coldplay",
+                tags: ["Pop"],
+                date: "2026-08-15",
+                city: "Manchester",
+            },
+            {
+                _id: "4",
+                name: "Already Booked Show",
+                artist: "Coldplay",
+                tags: ["Pop"],
+                date: "2026-08-20",
+                city: "Manchester",
+            }
+        ]
+    })
+}));
+
 const events = [
     {
         _id: "1",
@@ -73,15 +118,19 @@ const events = [
 ];
 
 function renderRecommendations(props = {}) {
+    const profile = {
+        favouriteArtists: props.favouriteArtists || [],
+        savedEvents: props.savedEvents || [],
+        bookings: props.bookings || [],
+        homeLocation: props.homeLocation || { city: "Manchester" },
+    };
+
     return render(
         <Recommendations
-            favouriteArtists={[]}
+            profile={profile}
             setFavouriteArtists={vi.fn()}
-            savedEvents={[]}
-            bookings={[]}
             onSavedToggled={vi.fn()}
             events={events}
-            {...props}
         />
     );
 }
@@ -93,38 +142,36 @@ describe("Recommendations", () => {
         toggleSavedEvent.mockResolvedValue({ profile: { savedEvents: [] } });
     });
 
-    test("prompts the user to engage when there is no activity", () => {
-        renderRecommendations();
+    test("prompts the user to engage when there is no activity", async () => {
+        renderRecommendations({ homeLocation: { city: "Manchester" } });
         expect(
-            screen.getByText(/Save events or follow artists to see personalised recommendations/i)
+            await screen.findByText(/Save events or follow artists to see personalised recommendations/i)
         ).toBeInTheDocument();
     });
 
-    test("recommends events matching genres of followed artists, excluding saved/booked events", () => {
+    test("recommends events matching genres of followed artists, excluding saved/booked events", async () => {
         renderRecommendations({
             favouriteArtists: ["Coldplay"],
             savedEvents: [{ eventId: "3", tags: ["Pop"] }],
             bookings: ["4"],
         });
 
-        // Coldplay Live itself isn't recommended again (it's the source event,
-        // but recommendations only exclude saved/booked - so it can appear);
-        // Indie Night shares the "Pop" tag and should be recommended.
-        expect(screen.getByText("Indie Night")).toBeInTheDocument();
+        // Wait for recommendations to process and render
+        expect(await screen.findByText("Indie Night")).toBeInTheDocument();
         // Already saved / already booked events must be excluded.
         expect(screen.queryByText("Already Saved Show")).not.toBeInTheDocument();
         expect(screen.queryByText("Already Booked Show")).not.toBeInTheDocument();
     });
 
-    test("derives recommendation genres from saved event snapshots' tags", () => {
+    test("derives recommendation genres from saved event snapshots' tags", async () => {
         renderRecommendations({
             savedEvents: [{ eventId: "3", tags: ["Pop"] }],
         });
 
-        expect(screen.getByText("Indie Night")).toBeInTheDocument();
+        expect(await screen.findByText("Indie Night")).toBeInTheDocument();
     });
 
-    test("shows a message when activity exists but no new recommendations are available", () => {
+    test("shows a message when activity exists but no new recommendations are available", async () => {
         renderRecommendations({
             favouriteArtists: ["Coldplay"],
             savedEvents: [
@@ -137,16 +184,16 @@ describe("Recommendations", () => {
         });
 
         expect(
-            screen.getByText(/No new recommendations right now/i)
+            await screen.findByText(/No new recommendations right now/i)
         ).toBeInTheDocument();
     });
 
-    test("renders recommended event cards with the same image and HH:MM time formatting as the Feed page", () => {
+    test("renders recommended event cards with the same image and HH:MM time formatting as the Feed page", async () => {
         renderRecommendations({
             favouriteArtists: ["Coldplay"],
         });
 
-        const image = screen.getByRole("img", { name: /Indie Night image/i });
+        const image = await screen.findByRole("img", { name: /Indie Night image/i });
         expect(image).toHaveAttribute("src", "https://example.com/wetleg.jpg");
         expect(image).toHaveClass("event-image");
 

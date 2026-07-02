@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter } from "react-router-dom";
@@ -12,7 +13,15 @@ vi.mock("../../src/components/Footer", () => ({
     default: () => <footer data-testid="footer-stub" />,
 }));
 vi.mock("../../src/components/LocationSearch", () => ({
-    default: () => <div data-testid="location-search-stub" />,
+    default: ({ onCitySelect }) => (
+        <button
+            type="button"
+            data-testid="location-search-stub"
+            onClick={() => onCitySelect({ city: "Bristol", lat: 51.4545, lng: -2.5879 })}
+        >
+            Select Bristol
+        </button>
+    ),
 }));
 
 vi.mock("../../src/services/authentication", () => ({
@@ -33,6 +42,7 @@ import {
     getMyProfile,
     getMyBookings,
     getSavedEvents,
+    updateHomeLocation,
 } from "../../src/services/userProfile";
 
 const defaultSession = {
@@ -81,8 +91,10 @@ describe("Profile Page", () => {
         expect(await screen.findByText("London")).toBeInTheDocument();
         expect(screen.getByText("Beyonce")).toBeInTheDocument();
         expect(screen.getByText("Mariah Carey")).toBeInTheDocument();
-        expect(screen.getByText(/Welcome back,/i)).toBeInTheDocument();
-        expect(screen.getByText("Test User")).toBeInTheDocument();
+        // First name only — not the full name, and not the email
+        expect(screen.getByText("Test")).toBeInTheDocument();
+        expect(screen.queryByText("Test User")).not.toBeInTheDocument();
+        expect(screen.queryByText("user@test.com")).not.toBeInTheDocument();
     });
 
     test("shows error message when fetching profile fails", async () => {
@@ -93,6 +105,88 @@ describe("Profile Page", () => {
         expect(
             await screen.findByText("Unable to fetch user's profile")
         ).toBeInTheDocument();
+    });
+
+    describe("home location editing", () => {
+        test("does not show the edit form until 'Update location' is clicked", async () => {
+            getMyProfile.mockResolvedValue({ profile: baseProfile });
+
+            renderProfilePage();
+
+            await screen.findByText("London");
+            expect(screen.queryByTestId("location-search-stub")).not.toBeInTheDocument();
+        });
+
+        test("clicking 'Update location' opens the edit form", async () => {
+            getMyProfile.mockResolvedValue({ profile: baseProfile });
+            const user = userEvent.setup();
+
+            renderProfilePage();
+
+            const button = await screen.findByRole("button", { name: /update location/i });
+            await user.click(button);
+
+            expect(await screen.findByTestId("location-search-stub")).toBeInTheDocument();
+        });
+
+        test("selecting a city and submitting updates the displayed location and shows a success message", async () => {
+            getMyProfile.mockResolvedValue({ profile: baseProfile });
+            updateHomeLocation.mockResolvedValue("Bristol");
+            const user = userEvent.setup();
+
+            renderProfilePage();
+
+            const openButton = await screen.findByRole("button", { name: /update location/i });
+            await user.click(openButton);
+
+            const citySearch = await screen.findByTestId("location-search-stub");
+            await user.click(citySearch);
+
+            const submitButton = screen.getByRole("button", { name: /^update$/i });
+            await user.click(submitButton);
+
+            await waitFor(() => {
+                expect(updateHomeLocation).toHaveBeenCalledWith({
+                    city: "Bristol",
+                    lat: 51.4545,
+                    long: -2.5879,
+                });
+            });
+
+            expect(await screen.findByText("Bristol")).toBeInTheDocument();
+            expect(
+                screen.getByText("Your home location has been updated.")
+            ).toBeInTheDocument();
+        });
+
+        test("closes the popover after a successful update", async () => {
+            getMyProfile.mockResolvedValue({ profile: baseProfile });
+            updateHomeLocation.mockResolvedValue("Bristol");
+            const user = userEvent.setup();
+
+            renderProfilePage();
+
+            await user.click(await screen.findByRole("button", { name: /update location/i }));
+            await user.click(await screen.findByTestId("location-search-stub"));
+            await user.click(screen.getByRole("button", { name: /^update$/i }));
+
+            await waitFor(() => {
+                expect(screen.queryByTestId("location-search-stub")).not.toBeInTheDocument();
+            });
+        });
+
+        test("does not call updateHomeLocation if no city has been selected", async () => {
+            getMyProfile.mockResolvedValue({ profile: baseProfile });
+            const user = userEvent.setup();
+
+            renderProfilePage();
+
+            await user.click(await screen.findByRole("button", { name: /update location/i }));
+            const submitButton = screen.getByRole("button", { name: /^update$/i });
+            await user.click(submitButton);
+
+            expect(updateHomeLocation).not.toHaveBeenCalled();
+        });
     });
 
     test("shows empty-state messages when bookings and saved events are empty", async () => {

@@ -203,7 +203,8 @@ describe("profile controller", () => {
                     city: "London",
                     lat: 51.5072,
                     long: 0.1276
-                }
+                },
+                hasSetHomeLocation: true
             }
 
             //1. Program the scenario — "the DB has this profile for this user"
@@ -235,7 +236,8 @@ describe("profile controller", () => {
                         city: "London",
                         lat: 51.5072,
                         long: 0.1276
-                    }
+                    },
+                    hasSetHomeLocation: true
                 },
                 { new: true })
 

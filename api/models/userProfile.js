@@ -23,6 +23,11 @@ const UserProfileSchema = new mongoose.Schema({
         unique: true,
     },
     isFirstLogin: {type: Boolean, default: true},
+    // Tracks whether the user has ever explicitly chosen a home location
+    // (either at signup or afterwards), as opposed to still sitting on the
+    // "Manchester" placeholder default below. Used to decide whether the
+    // "set your home city" pop-up should be shown.
+    hasSetHomeLocation: { type: Boolean, default: false },
     favouriteArtists: { type: [String], default: [] },
     savedEvents: { type: [savedEventSchema], default: [] }, 
     homeLocation: {

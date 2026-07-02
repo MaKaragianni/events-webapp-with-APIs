@@ -65,8 +65,11 @@ export default function EventCard({ event, isLoggedIn, savedEvents }) {
             ?? images.sort((a, b) => b.width - a.width)[0]
         );
     }
-    let sizes = pickEventCardImage(event.images)
-    if (!event) return null;
+
+    let sizes = event.images && event.images.length > 0 
+    ? pickEventCardImage(event.images) 
+    : null;
+
     return (
         <div
             className="event-card"

@@ -1,6 +1,13 @@
 import createFetchMock from "vitest-fetch-mock";
 import { describe, vi, expect, test } from "vitest";
-import { getMyProfile, toggleSavedEvent, addBooking, getMyBookings } from "../../src/services/userProfile";
+import {
+    getMyProfile,
+    toggleSavedEvent,
+    addBooking,
+    getMyBookings,
+    updateHomeLocation,
+    updateIsFirstLogin,
+} from "../../src/services/userProfile";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 createFetchMock(vi).enableMocks();
@@ -127,6 +134,63 @@ describe("userProfile services", () => {
         });
     });
   
+    describe("updateHomeLocation", () => {
+        test("sends PUT to /profile/me/location with the homeLocation payload", async () => {
+            const mockResponse = {
+                profile: { homeLocation: { city: "Bristol", lat: 51.4545, long: -2.5879 } },
+            };
+            fetch.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 });
+
+            await updateHomeLocation({ city: "Bristol", lat: 51.4545, long: -2.5879 });
+
+            const [url, options] = fetch.mock.lastCall;
+            expect(url).toEqual(`${BACKEND_URL}/profile/me/location`);
+            expect(options.method).toEqual("PUT");
+            expect(options.credentials).toEqual("include");
+            expect(JSON.parse(options.body)).toEqual({
+                homeLocation: { city: "Bristol", lat: 51.4545, long: -2.5879 },
+            });
+        });
+
+        test("returns just the updated city on 200", async () => {
+            const mockResponse = {
+                profile: { homeLocation: { city: "Bristol", lat: 51.4545, long: -2.5879 } },
+            };
+            fetch.mockResponseOnce(JSON.stringify(mockResponse), { status: 200 });
+
+            const result = await updateHomeLocation({ city: "Bristol", lat: 51.4545, long: -2.5879 });
+
+            expect(result).toEqual("Bristol");
+        });
+
+        test("throws error when status not 200", async () => {
+            fetch.mockResponseOnce(JSON.stringify({ error: "Something went wrong" }), { status: 500 });
+
+            await expect(
+                updateHomeLocation({ city: "Bristol", lat: 51.4545, long: -2.5879 })
+            ).rejects.toThrow("Unable to update your home location");
+        });
+    });
+
+    describe("updateIsFirstLogin", () => {
+        test("sends PUT to /profile/me/complete-first-login with credentials", async () => {
+            fetch.mockResponseOnce(null, { status: 204 });
+
+            await updateIsFirstLogin();
+
+            const [url, options] = fetch.mock.lastCall;
+            expect(url).toEqual(`${BACKEND_URL}/profile/me/complete-first-login`);
+            expect(options.method).toEqual("PUT");
+            expect(options.credentials).toEqual("include");
+        });
+
+        test("throws error when status not 204", async () => {
+            fetch.mockResponseOnce(JSON.stringify({ error: "Something went wrong" }), { status: 500 });
+
+            await expect(updateIsFirstLogin()).rejects.toThrow("Unable to update session info");
+        });
+    });
+
     describe("getMyBookings", () => {
         test("sends GET to /profile/me/bookings with credentials", async () => {
             fetch.mockResponseOnce(JSON.stringify({ bookings: [] }), { status: 200 });

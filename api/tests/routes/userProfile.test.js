@@ -112,6 +112,20 @@ describe("PUT /profile/me/location", () => {
         expect(response.body.profile.homeLocation).toEqual(newLocation);
     });
 
+    test("should set hasSetHomeLocation to true once the user picks a location", async () => {
+        // hasSetHomeLocation starts false even though homeLocation.city defaults
+        // to "Manchester" - it should flip to true once the user actually submits one.
+        const fakeProfile = createFakeUserProfile({ hasSetHomeLocation: false });
+        await userProfile.create(fakeProfile);
+
+        const response = await request(app)
+            .put("/profile/me/location")
+            .send({ homeLocation: { city: "Manchester", lat: 53.4808, long: -2.2426 } });
+
+        expect(response.status).toBe(200);
+        expect(response.body.profile.hasSetHomeLocation).toBe(true);
+    });
+
     test("should return 400 if homeLocation is missing", async () => {
         const fakeProfile = createFakeUserProfile();
         await userProfile.create(fakeProfile);

@@ -33,6 +33,17 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/profile', userProfileRouter)
 
+// DEV ONLY — surfaces the most recent password-reset link so the frontend
+// can show it in a pop-up while no real email provider is configured.
+// Remove this route (and api/lib/devResetLinkStore.js) once
+// sendResetPassword in lib/auth.js sends real emails.
+if (process.env.NODE_ENV !== 'production') {
+  const { getLastResetLink } = require('./lib/devResetLinkStore')
+  app.get('/dev/reset-link', (req, res) => {
+    res.json({ url: getLastResetLink() })
+  })
+}
+
 // 404 handler
 app.use((_req, res) => {
   res.status(404).json({ err: 'Error 404: Not Found' });

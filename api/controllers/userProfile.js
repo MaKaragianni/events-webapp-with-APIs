@@ -154,7 +154,7 @@ const updateLocation = async (req, res) => {
         }
         const profile = await UserProfile.findOneAndUpdate(
             { authUserId: req.user.id },
-            { homeLocation },
+            { homeLocation, hasSetHomeLocation: true },
             { new: true }
         )
         return res.json({ profile })

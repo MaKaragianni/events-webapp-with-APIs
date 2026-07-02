@@ -1,7 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -165,6 +165,30 @@ h1 {
   html {
     @apply font-sans;
   }
+}
+
+.geoapify-signup-wrapper .geoapify-autocomplete-input {
+  width: 100% !important;
+  border-radius: var(--radius-lg) !important; /* matches rounded-lg */
+  border: 1px solid var(--input) !important;   /* matches border-input */
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  padding: 0.625rem 1rem !important;           /* matches px-4 py-2.5 */
+  font-size: 0.875rem !important;              /* matches text-sm */
+  transition: colors 0.2s;
+  outline: none !important;
+}
+
+.geoapify-signup-wrapper .geoapify-autocomplete-input:focus {
+  border-color: var(--secondary) !important;
+  box-shadow: 0 0 0 2px oklch(from var(--secondary) l c h / 40%) !important;
+}
+
+.geoapify-signup-wrapper .geoapify-autocomplete-items {
+  background-color: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--foreground) !important;
 }
 
 @layer utilities {

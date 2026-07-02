@@ -32,33 +32,32 @@ function formatTime(timeStr) {
 function EventSnapshotCard({ item, onClick }) {
     return (
         <li
-            className="event-card event-snapshot-card"
+            className="event-card group list-none overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md"
             data-testid="event-snapshot-card"
             onClick={onClick}
             role={onClick ? "button" : undefined}
             tabIndex={onClick ? 0 : undefined}
             onKeyDown={onClick ? (e) => e.key === "Enter" && onClick() : undefined}
-            style={{ 
+            style={{
                 cursor: onClick ? "pointer" : "default",
-                listStyleType: "none"
             }}
         >
             {item.image?.url && (
                 <img
                     src={item.image.url}
                     alt={`${item.name} event image`}
-                    className="event-image"
+                    className="event-image h-36 w-full object-cover"
                     data-testid="event-snapshot-image"
                 />
             )}
-            <div className="event_body">
-                <h2 className="event_title">{item.name}</h2>
-                <p className="event_artist">{item.artist}</p>
-                <p className="event_datetime">
+            <div className="event_body flex flex-col gap-1 p-4">
+                <h3 className="event_title font-heading text-base leading-tight text-primary normal-case">{item.name}</h3>
+                <p className="event_artist text-sm font-semibold text-secondary">{item.artist}</p>
+                <p className="event_datetime text-xs text-muted-foreground">
                     {formatDate(item.date)}
-                    {item.time && ` ${formatTime(item.time)}`}
+                    {item.time && ` · ${formatTime(item.time)}`}
                 </p>
-                <p className="event_location">
+                <p className="event_location text-xs text-muted-foreground">
                     {(item.venue?.name || item.venue) ? `${item.venue?.name || item.venue}, ` : ""}
                     {item.city}
                 </p>
@@ -67,14 +66,35 @@ function EventSnapshotCard({ item, onClick }) {
     );
 }
 
+function EventSnapshotGrid({ items, testId, emptyMessage, getOnClick }) {
+    if (items.length === 0) {
+        return <p className="mt-3 text-sm italic text-muted-foreground">{emptyMessage}</p>;
+    }
+    return (
+        <ul
+            className="mt-4 grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3"
+            data-testid={testId}
+        >
+            {items.map((item) => (
+                <EventSnapshotCard
+                    key={item.eventId ?? item._id}
+                    item={item}
+                    onClick={getOnClick ? getOnClick(item) : undefined}
+                />
+            ))}
+        </ul>
+    );
+}
+
 export function ProfilePage() {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [homeLocation, setHomeLocation] = useState(null);
+    const [success, setSuccess] = useState(false);
     const [bookings, setBookings] = useState([]);
     const [savedEvents, setSavedEvents] = useState([]);
-    const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
     const { data: session } = authClient.useSession();
     const navigate = useNavigate();
@@ -99,125 +119,131 @@ export function ProfilePage() {
     const upcomingSaved = savedEvents.filter((e) => !e.isPast);
     const pastSaved = savedEvents.filter((e) => e.isPast);
 
-    // Card-styling
-    const listFlexStyle = {
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "1.5rem",
-        padding: 0,
-        margin: "1rem 0"
-    };
+    const fullName = session?.user?.name?.trim();
+    const firstName = fullName ? fullName.split(" ")[0] : "there";
+    const avatarLetter = firstName.charAt(0).toUpperCase() || "?";
 
     return (
-        <div>
+        <div className="min-h-screen bg-background">
             <NavBar />
 
-            {/* Header section with user's name aligned next to profile context */}
-            <header style={{ borderBottom: "1px solid #eee", paddingBottom: "1rem", marginBottom: "2rem" }}>
-                <h1 style={{ marginBottom: "0.2rem" }}>Profile</h1>
-                {session?.user?.name && (
-                    <p style={{ fontSize: "1.2rem", color: "#070707", margin: 0 }}>
-                        Welcome back, <strong>{session.user.name}</strong>!
-                    </p>
-                )}
-            </header>
+            <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
+                <h1 className="sr-only">Profile</h1>
 
-            {profile && (
-                <div>
-                    <p><strong>Your location:</strong> {homeLocation}</p>
-                    <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-                        <PopoverTrigger>
-                            <Button>Edit</Button>
-                        </PopoverTrigger>
-                        <PopoverContent>
-                            <HomeLocationForm 
-                                onLocationUpdated={(updatedCity) => {
-                                    setHomeLocation(updatedCity)
-                                    setIsPopoverOpen(false)
-                                }}
+                {profile && (
+                    <div>
+                        {/* Header card — first name + home location, with location editing at the top */}
+                        <div className="flex flex-col gap-4 rounded-2xl bg-primary px-6 py-6 md:flex-row md:items-center md:justify-between md:px-8 md:py-7">
+                            <div className="flex items-center gap-4">
+                                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-secondary font-heading text-xl text-secondary-foreground normal-case">
+                                    {avatarLetter}
+                                </div>
+                                <div>
+                                    <p className="text-lg font-semibold text-primary-foreground">{firstName}</p>
+                                    <p className="text-sm text-primary-foreground/70">
+                                        {homeLocation || "No location set"}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                                <PopoverTrigger render={
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="shrink-0 self-start md:self-auto"
+                                    >
+                                        Update location
+                                    </Button>
+                                } />
+                                <PopoverContent className="w-80 overflow-visible" align="end">
+                                    <HomeLocationForm
+                                        onLocationUpdated={(updatedCity) => {
+                                            setHomeLocation(updatedCity);
+                                            setSuccess(true);
+                                            setIsPopoverOpen(false);
+                                        }}
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+
+                        {success && (
+                            <p className="mt-3 text-sm font-medium text-secondary">Your home location has been updated.</p>
+                        )}
+
+                        {/* Favourite artists */}
+                        <section className="mt-8">
+                            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                                Favourite artists
+                            </h2>
+                            {profile.favouriteArtists.length < 1 ? (
+                                <p className="mt-3 text-sm italic text-muted-foreground">
+                                    Follow some artists for personalised recommendations!
+                                </p>
+                            ) : (
+                                <ul className="mt-3 flex list-none flex-wrap gap-2 p-0">
+                                    {profile.favouriteArtists.map((artist) => (
+                                        <li
+                                            key={artist}
+                                            className="rounded-full bg-accent px-3 py-1 text-sm font-medium text-accent-foreground"
+                                        >
+                                            {artist}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </section>
+
+                        <section aria-label="Upcoming saved events" className="mt-10">
+                            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                                Saved Events
+                            </h2>
+                            <EventSnapshotGrid
+                                items={upcomingSaved}
+                                testId="saved-events-list"
+                                emptyMessage="No upcoming saved events."
+                                getOnClick={(event) => () => navigate(`/events/${event.eventId}`)}
                             />
-                        </PopoverContent>
-                    </Popover>
+                        </section>
 
-                    <p><strong>Your favourite artists:</strong> </p>
-                    {profile.favouriteArtists.length < 1 ? (
-                        <p><i>Follow some artists for personalised recommendations!</i></p>
-                    ) : (
-                        <ul>
-                            {profile.favouriteArtists.map((artist) => (
-                                <li key={artist}>{artist}</li>
-                            ))}
-                        </ul>
-                    )}
+                        <section aria-label="Past saved events" className="mt-10">
+                            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                                Past Saved Events
+                            </h2>
+                            <EventSnapshotGrid
+                                items={pastSaved}
+                                testId="past-saved-events-list"
+                                emptyMessage="No past saved events."
+                                getOnClick={(event) => () => navigate(`/events/${event.eventId}`)}
+                            />
+                        </section>
 
-                    <section aria-label="Upcoming saved events">
-                        <h2>Saved Events</h2>
-                        {upcomingSaved.length === 0 ? (
-                            <p><i>No upcoming saved events.</i></p>
-                        ) : (
-                            <ul className="event-feed event-snapshot-list" data-testid="saved-events-list">
-                                {upcomingSaved.map((event) => (
-                                    <EventSnapshotCard
-                                        key={event.eventId}
-                                        item={event}
-                                        onClick={() => navigate(`/events/${event.eventId}`)}
-                                    />
-                                ))}
-                            </ul>
-                        )}
-                    </section>
+                        <section aria-label="Upcoming bookings" className="mt-10">
+                            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                                Upcoming Bookings
+                            </h2>
+                            <EventSnapshotGrid
+                                items={upcomingBookings}
+                                testId="bookings-list"
+                                emptyMessage="No upcoming bookings."
+                                getOnClick={(booking) => booking.ticketUrl ? () => window.open(booking.ticketUrl, "_blank") : undefined}
+                            />
+                        </section>
 
-                    <section aria-label="Past saved events">
-                        <h2>Past Saved Events</h2>
-                        {pastSaved.length === 0 ? (
-                            <p><i>No past saved events.</i></p>
-                        ) : (
-                            <ul className="event-feed event-snapshot-list" data-testid="past-saved-events-list">
-                                {pastSaved.map((event) => (
-                                    <EventSnapshotCard
-                                        key={event.eventId}
-                                        item={event}
-                                        onClick={() => navigate(`/events/${event.eventId}`)}
-                                    />
-                                ))}
-                            </ul>
-                        )}
-                    </section>
-
-                    <section aria-label="Upcoming bookings">
-                        <h2>Upcoming Bookings</h2>
-                        {upcomingBookings.length === 0 ? (
-                            <p><i>No upcoming bookings.</i></p>
-                        ) : (
-                            <ul className="event-feed event-snapshot-list" data-testid="bookings-list">
-                                {upcomingBookings.map((booking) => (
-                                    <EventSnapshotCard
-                                        key={booking._id}
-                                        item={booking}
-                                        onClick={booking.ticketUrl ? () => window.open(booking.ticketUrl, "_blank") : undefined}
-                                    />
-                                ))}
-                            </ul>
-                        )}
-                    </section>
-
-                    <section aria-label="Past bookings">
-                        <h2>Past Bookings</h2>
-                        {pastBookings.length === 0 ? (
-                            <p><i>No past bookings.</i></p>
-                        ) : (
-                            <ul className="event-feed event-snapshot-list" data-testid="past-bookings-list">
-                                {pastBookings.map((booking) => (
-                                    <EventSnapshotCard
-                                        key={booking._id}
-                                        item={booking}
-                                    />
-                                ))}
-                            </ul>
-                        )}
-                    </section>
-                </div>
-            )}
+                        <section aria-label="Past bookings" className="mt-10">
+                            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                                Past Bookings
+                            </h2>
+                            <EventSnapshotGrid
+                                items={pastBookings}
+                                testId="past-bookings-list"
+                                emptyMessage="No past bookings."
+                            />
+                        </section>
+                    </div>
+                )}
+            </div>
             <Footer />
         </div>
     );
