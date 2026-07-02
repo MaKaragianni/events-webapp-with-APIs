@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 30px 64px;
-  gap: 32px;
+  gap: 20px;
   width: 100%;
   box-sizing: border-box;
 
@@ -19,7 +19,7 @@
 
 .hero-left {
   flex: 1;
-  max-width: 460px;       /* slightly narrower to match design */
+  max-width: 540px;       /* slightly narrower to match design */
 }
 
 .hero-subtitle {
@@ -80,7 +80,7 @@
 .hero-right {
   flex: 1;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .hero-artwork-placeholder {
@@ -108,113 +108,3 @@
   bottom: 0;
   right: 0;
 }
-
-/* .hero {
-  background: #071b39;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px 50px 15px;
-  min-height: 360px;
-  gap: 30px;
-  margin: auto;
-}
-
-.hero-left {
-  flex: 1;
-  max-width: 520px;
-}
-
-.hero-subtitle {
-  color: #e65386;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin: 0 0 16px;
-}
-
-.hero-left h1 {
-  color: white;
-  font-size: 36px;
-  font-weight: 900;
-  line-height: 1.05;
-  text-transform: uppercase;
-  margin: 0 0 20px;
-}
-
-.hero-left h1 span {
-  color: #e65386;
-}
-
-.hero-description {
-  color: #aeb8c8;
-  font-size: 16px;
-  line-height: 1.6;
-  margin: 0 0 32px;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 16px;
-}
-
-.hero-btn-primary {
-  background: #e65386;
-  color: white;
-  padding: 14px 28px;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 15px;
-  text-decoration: none;
-}
-
-.hero-btn-secondary {
-  background: transparent;
-  color: white;
-  padding: 14px 28px;
-  border-radius: 6px;
-  border: 2px solid white;
-  font-weight: 700;
-  font-size: 15px;
-  text-decoration: none;
-}
-
-.hero-right {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.hero-right img {
-  max-width: 500px;
-  width: 100%;
-  height: auto;
-}
-
-.hero-artwork-placeholder {
-  position: relative;
-  width: 260px;
-  height: 220px;
-}
-
-.hero-artwork-card {
-  position: absolute;
-  background: #1a2f55;
-  border-radius: 12px;
-}
-
-.hero-artwork-card.large {
-  width: 200px;
-  height: 160px;
-  top: 0;
-  left: 0;
-}
-
-.hero-artwork-card.small {
-  width: 160px;
-  height: 130px;
-  bottom: 0;
-  right: 0;
-} */
