@@ -47,6 +47,7 @@ const fetchAndStoreEventsForCity = async (city) => {
         sort: "date,asc",
         size: "20",
         classificationName: "Music",
+        countryCode: "GB"
     })
 
     const url = `https://app.ticketmaster.com/discovery/v2/events.json?${params}`
