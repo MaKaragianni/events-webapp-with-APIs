@@ -137,24 +137,6 @@ export function EventPage() {
     return timeString.slice(0, 5); // takes "19:00" from "19:00:00"
   }
 
-  function pickEventCardImage(images) {
-    const targetRatio = 16 / 9;
-    const minWidth = 640; // covers most card sizes at 2x density
-    const sixteenNine = images
-      .filter(img => Math.abs(img.width / img.height - targetRatio) < 0.05)
-      .sort((a, b) => a.width - b.width);
-
-    return (
-      sixteenNine.find(img => img.width >= minWidth)
-      ?? sixteenNine.at(-1)
-      ?? images.sort((a, b) => b.width - a.width)[0]
-    );
-  }
-
-  let sizes = event.images && event.images.length > 0
-    ? pickEventCardImage(event.images)
-    : null;
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error loading event</p>;
   if (!event) return <p>Event not found</p>;
@@ -235,7 +217,7 @@ export function EventPage() {
 
       <div className="page items-start">
         <div className="event-mini sticky top-12 self-start">
-          <img src={sizes.url} className="rounded object-cover" />
+          <img src={event.images[0].url} className="rounded object-cover" />
           <p className="font-bold text-3xl text-primary">{event.artist}</p>
           <div className="flex flex-row gap-3">
             {[... new Set(event.tags)].map((t) => <p key={t} className="flex flex-row gap-1 font-bold m-0 text-primary"><Tag />{t}</p>)}
