@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { toggleSavedEvent } from "../../services/userProfile";
 import { Bookmark } from "lucide-react";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Dialog,
     DialogClose,
@@ -23,10 +23,14 @@ function formatDate(dateString) {
     });
 }
 
-export default function EventCard({ event, isLoggedIn, savedEvents }) {
+export default function EventCard({ event, isLoggedIn, savedEvents = [] }) {
     const navigate = useNavigate();
     const [showAuthPrompt, setShowAuthPrompt] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
+
+    useEffect(() => {
+        setIsSaved(savedEvents.some((e) => e.eventId === event._id));
+    }, [savedEvents, event._id]);
 
     function handleCardClick(e) {
         e.stopPropagation();
@@ -112,8 +116,9 @@ export default function EventCard({ event, isLoggedIn, savedEvents }) {
                     onClick={handleSaveToFavourites}
                     className="absolute bottom-2 right-2"
                     data-testid ="save-event-btn"
+                    aria-label={isSaved ? "Remove from favourites" : "Add to favourites"}
                 >
-                    <Bookmark />
+                    <Bookmark fill={isSaved ? "currentColor" : "none"} />
                 </Button>
             </div>
             <div className="event_body">
