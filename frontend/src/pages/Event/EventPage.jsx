@@ -45,21 +45,20 @@ export function EventPage() {
   }, [id]);
 
   const handleBuyTickets = async () => {
-    // Redirect to login if not authenticated
+
     if (!session) {
       setShowAuthPrompt(true);
       return;
     }
 
     if (bookingState === "booked" || bookingState === "already_booked") return;
-
     setBookingState("loading");
 
     try {
-      // Record the booking
       await addBooking(id);
       setBookingState("booked");
       setShowConfirmation(true);
+      window.location.href = event.ticketUrl;
       return;
     } catch (err) {
       if (err.message === "already_booked") {
@@ -68,16 +67,6 @@ export function EventPage() {
       } else {
         setBookingState("error");
       }
-    }
-
-    // Open the Ticketmaster page in a new tab
-    try {
-      const { ticketUrl } = await getPurchaseLink(id);
-      if (ticketUrl) {
-        window.location.href = ticketUrl;
-      }
-    } catch {
-      // Ticket URL fetch failing shouldn't block the confirmation
     }
   };
 
@@ -135,10 +124,6 @@ export function EventPage() {
     return "Buy Tickets";
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error loading event</p>;
-  if (!event) return <p>Event not found</p>;
-
   function formatDate(dateString) {
     return new Date(dateString).toLocaleDateString("en-GB", {
       weekday: "short",
@@ -169,6 +154,10 @@ export function EventPage() {
   let sizes = event.images && event.images.length > 0
     ? pickEventCardImage(event.images)
     : null;
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error loading event</p>;
+  if (!event) return <p>Event not found</p>;
 
   return (
     <>
