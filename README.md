@@ -3,7 +3,8 @@
 enCore is a full-stack web application that lets users discover, save, and track live music events near them. Built by a team of 5 developers over two weeks at Makers Academy.
 
 ### Team
-Built by Coral, Joe, Kit, Maria and Zein at Makers Academy, 2025.
+Built by Coral, Joe, Kit, Maria and Zein at Makers Academy, 2026.
+This team project is forked from [https://github.com/jjcrl/events-webapp] and renamed for project organisation.
 
 ### What it does
 
