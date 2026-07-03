@@ -57,21 +57,21 @@ export function EventPage() {
   }, [session, event]);
 
   const handleBuyTickets = async () => {
-    // Redirect to login if not authenticated
+
     if (!session) {
       setShowAuthPrompt(true);
       return;
     }
 
     if (bookingState === "booked" || bookingState === "already_booked") return;
-
     setBookingState("loading");
 
     try {
-      // Record the booking
       await addBooking(id);
       setBookingState("booked");
       setShowConfirmation(true);
+      window.location.href = event.ticketUrl;
+      return;
     } catch (err) {
       if (err.message === "already_booked") {
         setBookingState("already_booked");
@@ -80,16 +80,6 @@ export function EventPage() {
         setBookingState("error");
         return; // genuine failure — don't attempt the redirect
       }
-    }
-
-    // Open the Ticketmaster page in a new tab
-    try {
-      const { ticketUrl } = await getPurchaseLink(id);
-      if (ticketUrl) {
-        window.location.href = ticketUrl;
-      }
-    } catch {
-      // Ticket URL fetch failing shouldn't block the confirmation
     }
   };
 
@@ -100,15 +90,14 @@ export function EventPage() {
       setShowAuthPrompt(true);
       return;
     }
-
     const wasSaved = isSaved;
     try {
       await toggleSavedEvent(event._id);
       setIsSaved(!wasSaved);
       toast.success(
         wasSaved
-          ? `${event.name} removed from favourites`
-          : `${event.name} added to favourites`
+          ? `Event removed from saved events`
+          : `Event added to saved events`
       );
     } catch {
       toast.error("Failed to update favourites");
@@ -122,7 +111,6 @@ export function EventPage() {
       setShowAuthPrompt(true);
       return;
     }
-
     const wasFaved = isArtistFaved;
     try {
       await toggleFavouriteArtists(event.artist);
@@ -149,10 +137,6 @@ export function EventPage() {
     return "Buy Tickets";
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error loading event</p>;
-  if (!event) return <p>Event not found</p>;
-
   function formatDate(dateString) {
     return new Date(dateString).toLocaleDateString("en-GB", {
       weekday: "short",
@@ -166,23 +150,9 @@ export function EventPage() {
     return timeString.slice(0, 5); // takes "19:00" from "19:00:00"
   }
 
-  function pickEventCardImage(images) {
-    const targetRatio = 16 / 9;
-    const minWidth = 640; // covers most card sizes at 2x density
-    const sixteenNine = images
-      .filter(img => Math.abs(img.width / img.height - targetRatio) < 0.05)
-      .sort((a, b) => a.width - b.width);
-
-    return (
-      sixteenNine.find(img => img.width >= minWidth)
-      ?? sixteenNine.at(-1)
-      ?? images.sort((a, b) => b.width - a.width)[0]
-    );
-  }
-
-  let sizes = event.images && event.images.length > 0
-    ? pickEventCardImage(event.images)
-    : null;
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error loading event</p>;
+  if (!event) return <p>Event not found</p>;
 
   return (
     <>
@@ -195,6 +165,7 @@ export function EventPage() {
       >
         <ArrowLeft /> Back
       </Button>
+
       <Dialog open={showAuthPrompt} onOpenChange={setShowAuthPrompt}>
         <DialogContent className="sm:max-w-[400px] text-center">
           <DialogHeader>
@@ -205,11 +176,8 @@ export function EventPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex flex-col gap-2 sm:flex-col">
-            <Button onClick={() => navigate("/login")}>
-              Create Account
-            </Button>
-            <Button variant="outline" onClick={() => navigate("/login")}>
-              I already have an account
+            <Button onClick={() => navigate("/login")} data-testid='login'>
+              Create Account / Sign in 
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -260,7 +228,7 @@ export function EventPage() {
 
       <div className="page items-start">
         <div className="event-mini sticky top-12 self-start">
-          <img src={sizes.url} className="rounded object-cover" />
+          <img src={event.images[0].url} className="rounded object-cover" />
           <p className="font-bold text-3xl text-primary">{event.artist}</p>
           <div className="flex flex-row gap-3">
             {[... new Set(event.tags)].map((t) => <p key={t} className="flex flex-row gap-1 font-bold m-0 text-primary"><Tag />{t}</p>)}
@@ -273,7 +241,7 @@ export function EventPage() {
               aria-label="Buy Tickets"
               variant="secondary"
             >
-              <TicketCheck/>
+              <TicketCheck />
               {buttonLabel()}
             </Button>
             <Button onClick={handleSaveArtist} disabled={isPending} variant="secondary">
@@ -299,7 +267,7 @@ export function EventPage() {
           )}
           <p className="text-2xl font-semibold text-primary pt-5">Event Details</p>
           <Separator />
-          {event?.description.split(".").map((line) => (
+          {event.description && event.description.split(".").map((line) => (
             <p key={line[0]} className="text-l">{line}</p>
           ))}
           <div className="flex flex-col gap-2 pb-5 pt-5 text-primary">

@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent,within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { vi } from "vitest";
 
@@ -67,7 +67,7 @@ describe("EventPage", () => {
   });
 
   test("shows loading state initially", () => {
-    getEventById.mockReturnValue(new Promise(() => {}));
+    getEventById.mockReturnValue(new Promise(() => { }));
     renderPage();
     expect(screen.getByText(/loading.../i)).toBeInTheDocument();
   });
@@ -82,7 +82,7 @@ describe("EventPage", () => {
     getEventById.mockRejectedValue(new Error("Fetch failed"));
     renderPage();
     expect(await screen.findByText(/error loading event/i)).toBeInTheDocument();
-});
+  });
 
   test("shows event not found if event is null", async () => {
     getEventById.mockResolvedValue({ event: null });
@@ -99,6 +99,13 @@ describe("EventPage", () => {
     });
 
     fireEvent.click(button);
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toBeInTheDocument();
+
+    // Confirm via the dialog's login button/link
+    const loginButton = within(dialog).getByTestId("login");
+    fireEvent.click(loginButton);
+
     expect(mockedNavigate).toHaveBeenCalledWith("/login");
   });
 

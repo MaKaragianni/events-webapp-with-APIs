@@ -91,14 +91,6 @@ function CalendarPage() {
         <div className="flex flex-col h-screen w-screen">
             <NavBar />
             <div className="flex-1 flex flex-col min-h-dvh">
-                        <div className="grid grid-cols-7 border-b">
-                            {DAY_LABELS.map((label) => (
-                                <div key={label} className="px-2 py-1.5 text-xs font-medium text-muted-foreground text-center">
-                                    {label}
-                                </div>
-                            ))}
-                        </div>
-
                         <div className="grid grid-cols-7 grid-rows-5 flex-1 overflow-hidden">
                             {loading
                                 ? Array.from({ length: 35 }, (_, i) => (

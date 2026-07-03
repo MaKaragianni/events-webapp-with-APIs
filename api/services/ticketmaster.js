@@ -24,24 +24,14 @@ const ensureEventsForCity = async (city) => {
         return { city, refreshed: false, reason: "fresh" }
     }
 
-    // after conditional logic ^ means it IS stale or does not exisit 
-
     // update the cache with the new city / refreshed city 
     const result = await fetchAndStoreEventsForCity(city)
 
-    const hasUsableEvents =
-    result.fetched > 0 || result.upserted > 0 || result.modified > 0
-
-    if (!hasUsableEvents) {
-    return { city, refreshed: false, reason: "no usable events fetched" }
-    }
-
     await CityCache.updateOne(
-    { city },
-    { lastRefreshed: new Date() },
-    { upsert: true }
+        { city },
+        { lastRefreshed: new Date() },
+        { upsert: true }
     )
-
     // return the outcome
     return { city, refreshed: true, ...result }
 }
@@ -49,24 +39,21 @@ const ensureEventsForCity = async (city) => {
 const fetchAndStoreEventsForCity = async (city) => {
 
     // search parameters
-        const now = new Date()
-        const thirtyDaysLater = new Date()
-        thirtyDaysLater.setDate(now.getDate() + 30)
+    const now = new Date()
+    const thirtyDaysLater = new Date()
+    thirtyDaysLater.setDate(now.getDate() + 30)
 
-        const params = new URLSearchParams({
+    const params = new URLSearchParams({
         apikey: process.env.TICKETMASTER_API_KEY,
         city,
         sort: "date,asc",
-        size: "50",
+        size: city === "London" ? "100" : "50",
         classificationName: "Music",
         countryCode: "GB",
-        startDateTime: now.toISOString().replace(/\.\d{3}Z$/, "Z"),
-        endDateTime: thirtyDaysLater.toISOString().replace(/\.\d{3}Z$/, "Z"),
-        })
+    })
 
     const url = `https://app.ticketmaster.com/discovery/v2/events.json?${params}`
     const response = await fetch(url)
-
 
     //  error for bad response 
     if (!response.ok) {
@@ -119,9 +106,30 @@ const fetchAndStoreEventsForCity = async (city) => {
         }
     })
 
+    const UPSELL_KEYWORDS = [
+        "venue premium",
+        "ultimate bar package",
+        "official ticket and hotel",
+        "vip package",
+        "premium package",
+        "hospitality package",
+        "hotel",
+        "bar package",
+        "hotel package",
+        "vip",
+        "restaurant"
+    ]
+
     // validate entries
     const validEvents = eventDocs.filter(
-        (e) => e.name && e.artist && e.date && e.city
+        (e) => e.name &&
+            e.artist &&
+            e.date &&
+            e.city &&
+            !e.name.toLowerCase().includes("everywhere at once") &&
+            !e.artist.toLowerCase().includes("everywhere at once") &&
+            !UPSELL_KEYWORDS.some(keyword => e.name.toLowerCase().includes(keyword)) &&
+            e.artist !== "Day Fever"
     )
 
     // check fot skipped 

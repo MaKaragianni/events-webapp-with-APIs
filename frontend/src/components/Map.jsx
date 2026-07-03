@@ -2,16 +2,28 @@ import { GoogleMap, MarkerF, useJsApiLoader, InfoWindowF } from "@react-google-m
 import { useNavigate } from "react-router-dom"
 import { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns"
+import { MarkerClusterer } from "@googlemaps/markerclusterer"
 
 function Map(props) {
 
     const [map, setMap] = useState(null)
     const [hovered, setHovered] = useState(null)
+    const [selected, setSelected] = useState(null)
 
     const containerStyle = useMemo(() => ({
         width: props.width,
         height: props.height
     }), [props.width, props.height])
+
+    const groupedByVenue = useMemo(() => {
+        const map = {}
+        props.events.filter(e => e.venue?.location?.coordinates).forEach(e => {
+            const key = e.venue.location.coordinates.join(",")
+            if (!map[key]) map[key] = { venue: e.venue, events: [] }
+            map[key].events.push(e)
+        })
+        return Object.values(map)
+    }, [props.events])
 
 
     useEffect(() => {
@@ -34,6 +46,7 @@ function Map(props) {
 
     if (!isLoaded) return <p>Loading map...</p>
 
+
     return (
         <GoogleMap
             mapContainerStyle={containerStyle}
@@ -46,29 +59,49 @@ function Map(props) {
         >
             {props.events.filter((e) => e.venue?.location?.coordinates).map((e) => (
                 <>
-                    <MarkerF
-                        key={e._id}
-                        position={{
-                            lat: e.venue.location.coordinates[1],
-                            lng: e.venue.location.coordinates[0]
-                        }}
-                        onClick={(() => (navigate(`/events/${e._id}`)))}
-                        onMouseOver={() => setHovered(e)}
-                        onMouseOut={() => setHovered(null)}
-                    />
-                    {hovered && (
+                    {groupedByVenue.map((group) => (
+                        <MarkerF
+                            key={group.venue.name}
+                            position={{
+                                lat: group.venue.location.coordinates[1],
+                                lng: group.venue.location.coordinates[0]
+                            }}
+                            onClick={() => {
+                              //  if (group.events.length === 1) {
+                                //    navigate(`/events/${group.events[0]._id}`)
+                               // } else {
+                                    setSelected(group)
+                                //}
+                            }}
+                        />
+                    ))}
+
+                    {selected && (
                         <InfoWindowF
                             position={{
-                                lat: hovered.venue.location.coordinates[1],
-                                lng: hovered.venue.location.coordinates[0]
+                                lat: selected.venue.location.coordinates[1],
+                                lng: selected.venue.location.coordinates[0]
                             }}
+                            onCloseClick={() => setSelected(null)}
                             options={{ disableAutoPan: true, pixelOffset: new window.google.maps.Size(0, -35) }}
                         >
-                            <div style={{paddingTop:"15px"}}>
-                                <strong>{hovered.artist}</strong>
-                                <div style={{ fontSize: '12px', color: '#666' }}>{hovered.venue.name}</div>
-                                <div style={{ fontSize: '12px', color: '#666' }}>{hovered.venue.address}</div>
-                                <div style={{ fontSize: '12px', color: '#666' }}>{format(hovered.date, "eeee d MMMM")}</div>
+                            <div style={{ paddingTop: "15px" }}>
+                                <strong>{selected.venue.name}</strong>
+                                <div style={{ fontSize: "12px", color: "#666" }}>{selected.venue.address}</div>
+                                <hr style={{ margin: "4px 0" }} />
+                                {selected.events.map(e => (
+                                    <div
+                                        key={e._id}
+                                        style={{ padding: "2px 0", cursor: "pointer" }}
+                                        onClick={() => navigate(`/events/${e._id}`)}
+                                        className="info-event-row"
+                                    >
+                                        <strong>{e.artist}</strong>
+                                        <span style={{ fontSize: "12px", color: "#666", marginLeft: "8px" }}>
+                                            {format(e.date, "eeee d MMMM")}
+                                        </span>
+                                    </div>
+                                ))}
                             </div>
                         </InfoWindowF>
                     )}

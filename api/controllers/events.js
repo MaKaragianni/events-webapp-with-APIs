@@ -30,7 +30,6 @@ const getEvents = async (req, res) => {
                 console.warn("Refresh failed, serving cached data:", err.message)
             }
         }
-
         // filtering set up
         const filter = {}
         if (city) filter.city = city
@@ -43,13 +42,25 @@ const getEvents = async (req, res) => {
                 filter.date.$lte = endOfDay
             }
         }
+
+        const topTags = await Event.aggregate([
+            { $match: { ...filter } },
+            { $unwind: "$tags" },
+            { $group: { _id: "$tags", count: { $sum: 1 } } },
+            { $sort: { count: -1, _id: 1 } },
+            { $limit: 9 }
+        ])
+
         if (tag) filter.tags = tag
+
         const totalEvents = await Event.countDocuments(filter)
+
         // find the events with matches
         const events = await Event.find(filter).sort({ date: 1 }).skip(parsedOffset).limit(parsedLimit)
-        return res.status(200).json({ 
-            events, 
-            totalEvents
+        return res.status(200).json({
+            events,
+            totalEvents,
+            topTags: topTags.map(t => t._id)
         })
     } catch (err) {
         console.error("getEvents error:", err)

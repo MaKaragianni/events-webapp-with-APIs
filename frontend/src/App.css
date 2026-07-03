@@ -125,25 +125,34 @@
   z-index: 0;
 }
 
-
-
 .gm-style-iw.gm-style-iw-c {
     box-shadow: none !important;
-    border: solid 3px  whitesmoke
 }
-
 .gm-style-iw-tc::after {
     box-shadow: none !important;
 }
 
 .gm-style-iw-tc {
-    display: none !important;
-}
-
-.gm-style-iw button.gm-ui-hover-effect {
-    display: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
 }
 
 .gm-style-iw-chr {
-    display: none !important;
+  position: absolute;
+  top: 0;
+  right: 1rem;
+}
+
+.gm-ui-hover-effect {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.gm-style-iw-d {
+  padding-top: 20px;
+}
+
+
+.info-event-row:hover {
+  color: oklch(0.622 0.167 2.522)
 }

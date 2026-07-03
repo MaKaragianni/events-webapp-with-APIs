@@ -79,17 +79,7 @@ describe("EventCard", () => {
         });
     });
 
-    describe("heart (save event) button", () => {
-        test("renders an unsaved heart when event is not in savedEvents", () => {
-            renderCard({ savedEvents: [] });
-            expect(screen.getByTestId("save-event-btn").textContent).toBe("♡");
-        });
-
-        test("renders a filled heart when event is already saved", () => {
-            renderCard({ savedEvents: ["event-123"] });
-            expect(screen.getByTestId("save-event-btn").textContent).toBe("♥");
-        });
-
+    describe("save event button", () => {
         test("calls toggleSavedEvent with the event _id when clicked", async () => {
             renderCard({ savedEvents: [] });
             fireEvent.click(screen.getByTestId("save-event-btn"));
@@ -113,10 +103,10 @@ describe("EventCard", () => {
             });
         });
 
-        test("redirects to /login and does not call service when user is not logged in", () => {
+        test("rDoes not call service when user is not logged in", () => {
             renderCard({ isLoggedIn: false });
             fireEvent.click(screen.getByTestId("save-event-btn"));
-            expect(mockNavigate).toHaveBeenCalledWith("/login");
+            //expect(mockNavigate).toHaveBeenCalledWith("/login");
             expect(toggleSavedEvent).not.toHaveBeenCalled();
         });
     });

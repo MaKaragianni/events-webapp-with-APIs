@@ -2,13 +2,12 @@ import { Button } from "./ui/button";
 import CityCombobox from "./CityCombobox";
 import DateRangeFilter from "./DateRangeFilter";
 
-
-
 export default function EventFilters({
   city, from, to, tag,
   cities, topTags,
   onChange,
 }) {
+
   const handleClear = () => {
     onChange({ from: "", to: "", tag: "" })
   }
@@ -22,12 +21,12 @@ export default function EventFilters({
         <Button type="button" variant="outline" className="w-fit px-6 py-6" size="icon" onClick={handleClear}>Reset Filters</Button>
       </section>
       <section>
-        {topTags.filter((t) => t !== "Undefined" && t !== "Other").map((tagName) => (
+        {topTags.filter((t) => t !== "Undefined" && t !== "Other" && t !== "Miscellaneous").map((tagName) => (
           <Button
             key={tagName}
             onClick={() => onChange({ tag: tag === tagName ? "" : tagName })}
             variant="secondary"
-            className="mx-1 text-xl p-6 text-accent-foreground bg-accent font-bold rounded-full"
+            className={`mx-1 text-xl p-6 text-accent-foreground bg-${tag === tagName ? `secondary` : `accent`} font-bold rounded-full`}
           >
             {tagName}
           </Button>

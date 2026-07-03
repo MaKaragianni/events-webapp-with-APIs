@@ -10,23 +10,22 @@ import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 
 export default function DateRangeFilter({ from, to, onChange }) {
+
   const range = {
-    from: from ? format(new Date(from), "yyyy-MM-dd") : undefined,
-    to: to ? format(new Date(to), "yyyy-MM-dd") : undefined,
+    from: from ? new Date(from) : undefined,
+    to: to ? new Date(to) : undefined,
   }
 
-
-function handleSelect(selected) {
-  if (!selected) return
-  const fromStr = selected.from ? format(selected.from, "yyyy-MM-dd") : ""
-  const toStr = selected.to ? format(selected.to, "yyyy-MM-dd") : ""
-  const sameDay = fromStr && toStr && fromStr === toStr
-  onChange({
-    from: fromStr,
-    to: sameDay ? "" : toStr,
-  })
-}
-
+  function handleSelect(selected) {
+    if (!selected) return
+    const fromStr = selected.from ? format(selected.from, "yyyy-MM-dd") : ""
+    const toStr = selected.to ? format(selected.to, "yyyy-MM-dd") : ""
+    const sameDay = fromStr && toStr && fromStr === toStr
+    onChange({
+      from: fromStr,
+      to: sameDay ? "" : toStr,
+    })
+  }
 
   function handleClear() {
     onChange({ from: "", to: "" })
@@ -66,6 +65,7 @@ function handleSelect(selected) {
             selected={range}
             onSelect={handleSelect}
             numberOfMonths={1}
+            disabled={{ before: new Date() }}
           />
         </PopoverContent>
       </Popover>
