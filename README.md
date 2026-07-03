@@ -2,6 +2,9 @@
 
 enCore is a full-stack web application that lets users discover, save, and track live music events near them. Built by a team of 5 developers over two weeks at Makers Academy.
 
+### Team
+Built by Coral, Joe, Kit, Maria and Zein at Makers Academy, 2025.
+
 ### What it does
 
 - Browse live music events pulled from the Ticketmaster API
@@ -28,6 +31,7 @@ These two applications will communicate through HTTP requests, and need to be ru
 | Database | MongoDB, Mongoose |
 | Auth | Better Auth |
 | Events API | Ticketmaster Discovery API |
+| Maps | Google Maps API |
 | Location Search | Geoapify Autocomplete |
 
 ### Card wall
@@ -58,19 +62,16 @@ nvm install 20
 git clone <repo-url>
 cd events-webapp
 ```
-2. Every team member clone the fork to their local machine
-3. Install dependencies for both the `frontend` and `api` applications:
+2. Install dependencies for both the `frontend` and `api` applications:
 ```bash
 cd frontend
 npm install --legacy-peer-deps
-```
-```
 cd ../api
 npm install
 ```
    _Note:_ `--legacy-peer-deps` is required in the frontend due to a peer dependency conflict between Geoapify and React 18.
 
-4. Install an ESLint plugin for your editor, for example
+3. Install an ESLint plugin for your editor, for example
    [ESLint for VSCode](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 
 #### Setting up environment variables
